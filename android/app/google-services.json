@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "545542232062",
+    "project_id": "finalpbb",
+    "storage_bucket": "finalpbb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545542232062:android:26025aad7bd0bddf4bd2af",
+        "android_client_info": {
+          "package_name": "com.example.finalpbb"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXmZ0kIFZgrnxUoxFFGlA-D3ZoyOldc24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
