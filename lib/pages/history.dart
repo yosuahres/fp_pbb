@@ -59,9 +59,7 @@ class HistoryPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final data = docs[index].data() as Map<String, dynamic>;
               return ListTile(
-                leading: data['posterPath'] != null && data['posterPath'].isNotEmpty
-                    ? Image.network('https://image.tmdb.org/t/p/w92${data['posterPath']}')
-                    : const SizedBox(width: 50),
+                leading: Image.network('https://image.tmdb.org/t/p/w92${data['posterPath']}'),
 
                 title: Text(data['title'] ?? 'No Title'),
 
