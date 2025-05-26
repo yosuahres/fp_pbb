@@ -12,6 +12,37 @@ class HistoryPage extends StatelessWidget {
 
   HistoryPage({super.key});
 
+  void showCommentDialog(BuildContext context, String movieId) {
+    final TextEditingController commentController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add Comment'),
+          content: TextField(
+            controller: commentController,
+            decoration: const InputDecoration(hintText: 'Enter your comment'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _firestoreService.updateWatchedMovie(movieId, commentController.text);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,18 +62,47 @@ class HistoryPage extends StatelessWidget {
                 leading: data['posterPath'] != null && data['posterPath'].isNotEmpty
                     ? Image.network('https://image.tmdb.org/t/p/w92${data['posterPath']}')
                     : const SizedBox(width: 50),
+
                 title: Text(data['title'] ?? 'No Title'),
-                subtitle: Text(
-                  data['overview'] ?? '',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data['overview'] ?? '',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if ((data['comment'] ?? '').isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: Text(
+                          'Comment: ${data['comment']}',
+                          style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
                 ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await _firestoreService.deleteWatchedMovie(docs[index].id);
-                  },
-                ),
+
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () async {
+                        await _firestoreService.deleteWatchedMovie(docs[index].id);
+                      },
+                    ),             
+                    IconButton(
+                      icon: const Icon(Icons.plus_one),
+                      onPressed: () async {
+                        showCommentDialog(context, docs[index].id);
+                      },
+                    ),     
+                  ],
+                )
               );
             },
           );
