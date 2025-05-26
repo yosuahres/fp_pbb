@@ -10,21 +10,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin' # atau adopt
-        java-version: '17' # Sesuaikan dengan kebutuhan Flutter Anda
-    - uses: subosito/flutter-action@v2
-      with:
-        channel: 'stable' # atau beta, dev, master
-    - run: flutter pub get
-    - run: flutter build apk --release # Atau appbundle
-      # Contoh: flutter build appbundle --release
-    - uses: actions/upload-artifact@v3
-      with:
-        name: release-apk # Nama artifact
-        path: build/app/outputs/flutter-apk/app-release.apk # Path ke file APK
-        # Jika appbundle:
-        # name: release-appbundle
-        # path: build/app/outputs/bundle/release/app-release.aab
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.24.0
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build apk
+      - run: flutter build appbundle
