@@ -9,9 +9,7 @@ import 'package:finalpbb/pages/register.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -20,10 +18,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(initialRoute: 'login', routes: {
-      'home': (context) => const HomeScreen(),
-      'login': (context) => const LoginScreen(),
-      'register': (context) => const RegisterScreen(),
-    });
+    return MaterialApp(
+      initialRoute: 'login',
+      routes: {
+        'home': (context) => const HomeScreen(),
+        'login': (context) => const LoginScreen(),
+        'register': (context) => const RegisterScreen(),
+      },
+    );
   }
 }
