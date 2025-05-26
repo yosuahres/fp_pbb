@@ -1,3 +1,4 @@
+import 'package:finalpbb/db/firestore.dart';
 import 'package:finalpbb/pages/login.dart';
 import 'package:finalpbb/services/api_service.dart';
 import 'package:finalpbb/models/movie_model.dart';
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Movie> _movies = [];
   bool _isLoading = true;
+  final FirestoreService firestoreService = FirestoreService();
 
   @override
   void initState() {
@@ -34,6 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushReplacementNamed(context, 'login');
   }
 
+  void _watchedMovie(Movie movie) async {
+    await firestoreService.addWatchedMovie(
+      movie.id,
+      movie.title,
+      movie.posterPath,
+      movie.overview,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
@@ -49,6 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(Icons.logout),
                   onPressed: () => _logout(context),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.history),
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'history');
+                  },
+              ),
               ],
             ),
             body:
@@ -69,6 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.heart_broken),
+                            onPressed: () => _watchedMovie(movie),
+                          ),
                         );
                       },
                     ),
@@ -81,47 +102,3 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// import 'package:finalpbb/pages/login.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/material.dart';
-
-// class HomeScreen extends StatelessWidget {
-//   const HomeScreen({super.key});
-
-//   void logout(context) async {
-//     await FirebaseAuth.instance.signOut();
-//     Navigator.pushReplacementNamed(context, 'login');
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamBuilder<User?>(
-//       stream: FirebaseAuth.instance.authStateChanges(),
-//       builder: (context, snapshot) {
-//         if (snapshot.hasData) {
-//           return Scaffold(
-//             appBar: AppBar(
-//               title: const Text('Account Information'),
-//               centerTitle: true,
-//             ),
-//             body: Center(
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Text('Logged in as ${snapshot.data?.email}'),
-//                   const SizedBox(height: 24),
-//                   OutlinedButton(
-//                     onPressed: () => logout(context),
-//                     child: const Text('Logout'),
-//                   )
-//                 ],
-//               ),
-//             ),
-//           );
-//         } else {
-//           return const LoginScreen();
-//         }
-//       },
-//     );
-//   }
-// }

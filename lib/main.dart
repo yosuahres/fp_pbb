@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'package:finalpbb/pages/home.dart';
 import 'package:finalpbb/pages/login.dart';
 import 'package:finalpbb/pages/register.dart';
+import 'package:finalpbb/pages/history.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         'home': (context) => const HomeScreen(),
         'login': (context) => const LoginScreen(),
         'register': (context) => const RegisterScreen(),
+        'history': (context) => HistoryPage(),
       },
     );
   }
