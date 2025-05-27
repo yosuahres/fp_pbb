@@ -17,6 +17,9 @@ Aplikasi mobile untuk pembelian tiket film. Pengguna dapat menjelajahi detail fi
 # Activity Diagram
 ![Alt text](images/fp_ppb.jpg)
 
+# Arsitektur Sistem
+![Alt text](images/MoTix%20System%20Architecture%20Diagram%20-%20PPB%20C%20Kelompok%2010.jpg)
+
 # Fitur dan PIC
 1.Register (hares)  
 2.Login (hares)  
