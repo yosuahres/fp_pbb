@@ -68,8 +68,8 @@ class HistoryPage extends StatelessWidget {
                   children: [
                     Text(
                       data['overview'] ?? '',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      // maxLines: 2,
+                      // overflow: TextOverflow.ellipsis,
                     ),
                     if ((data['comment'] ?? '').isNotEmpty)
                       Padding(
