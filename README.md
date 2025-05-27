@@ -2,9 +2,9 @@
 
 | Name           | NRP        | Class     |
 | ---            | ---        | ----------|
-| Yosua Hares | 5025221270 | PBB (C) |
-| Ahmad Fadhilah Mappisara | 5025221195 | PBB (C) |
-| Muhammad Alfan Mahdi | 5025221275 | PBB (C) |
+| Yosua Hares | 5025221270 | PPB (C) |
+| Ahmad Fadhilah Mappisara | 5025221195 | PPB (C) |
+| Muhammad Alfan Mahdi | 5025221275 | PPB (C) |
 
 
 # Description App
