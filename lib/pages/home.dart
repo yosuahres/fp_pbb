@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.history),
                   onPressed: () {
-                    Navigator.pushNamed(context, 'history');
+                    Navigator.pushNamed(context, 'watchlist');
                   },
               ),
               ],
@@ -90,6 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: const Icon(Icons.heart_broken),
                             onPressed: () => _watchedMovie(movie),
                           ),
+                          onTap:  () {
+                            Navigator.pushNamed(context, 'ticketseat');
+                          },
                         );
                       },
                     ),

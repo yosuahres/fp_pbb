@@ -6,7 +6,9 @@ import 'firebase_options.dart';
 import 'package:finalpbb/pages/home.dart';
 import 'package:finalpbb/pages/login.dart';
 import 'package:finalpbb/pages/register.dart';
-import 'package:finalpbb/pages/history.dart';
+import 'package:finalpbb/pages/watchlist.dart';
+import 'package:finalpbb/pages/fitur_tiket/ticketseat.dart';
+import 'package:finalpbb/pages/fitur_tiket/ticketsummary.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +27,9 @@ class MyApp extends StatelessWidget {
         'home': (context) => const HomeScreen(),
         'login': (context) => const LoginScreen(),
         'register': (context) => const RegisterScreen(),
-        'history': (context) => HistoryPage(),
+        'watchlist': (context) => watchlistScreen(),
+        'ticketseat': (context) => const TicketSeatScreen(),
+        'ticketsummary': (context) => const TicketSummaryScreen(),
       },
     );
   }

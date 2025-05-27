@@ -1,16 +1,11 @@
-//////////////
-///Author: Yosua Hares
-///Desc: Daftar “Sudah Ditonton” CRUD
-////////////////
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalpbb/db/firestore.dart';
 
-class HistoryPage extends StatelessWidget {
+class watchlistScreen extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
 
-  HistoryPage({super.key});
+  watchlistScreen({super.key});
 
   void showCommentDialog(BuildContext context, String movieId) {
     final TextEditingController commentController = TextEditingController();
@@ -68,8 +63,8 @@ class HistoryPage extends StatelessWidget {
                   children: [
                     Text(
                       data['overview'] ?? '',
-                      // maxLines: 2,
-                      // overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if ((data['comment'] ?? '').isNotEmpty)
                       Padding(
