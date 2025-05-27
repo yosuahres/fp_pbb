@@ -14,6 +14,9 @@ Aplikasi mobile untuk pembelian tiket film. Pengguna dapat menjelajahi detail fi
 
 ![Alt text](images/Kelompok10_UseCaseDiagram.drawio-2.png)
 
+# Activity Diagram
+![Alt text](images/fp_ppb.jpg)
+
 # Fitur dan PIC
 1.Register (hares)  
 2.Login (hares)  
