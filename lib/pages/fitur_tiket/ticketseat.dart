@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalpbb/db/firestore.dart'; 
@@ -75,11 +77,11 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
 
   Color _getSeatColor(Seat seat) {
     if (seat.status == 'booked') {
-      return Colors.brown; 
+      return Colors.grey.shade400; 
     } else if (_selectedSeatDocIds.contains(seat.docId)) {
-      return Colors.teal.shade700; 
+      return Colors.blue.shade400; 
     } else {
-      return Colors.white70;
+      return Colors.blueGrey.shade900;
     }
   }
 
@@ -91,8 +93,6 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
       return;
     }
 
-    String DUMMY_USER_ID = "user123"; 
-
     setState(() { _isLoading = true; }); 
 
     try {
@@ -103,7 +103,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
         DocumentReference seatRef = _firestoreService.seats.doc(seatDocId);
         batch.update(seatRef, {
           'status': 'booked',
-          'userId': DUMMY_USER_ID,
+          'userId': FirebaseAuth.instance.currentUser?.uid,
           'timestamp': Timestamp.now(),
         });
       }
@@ -135,20 +135,12 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book Your Seat'),
+        title: const Text('nama tempat bioskop**'),
+        // backgroundColor: Colors.grey.shade50,
       ),
       body: Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomRight,
-          end: Alignment.topLeft,
-          colors: [
-            Colors.white,
-            Color(0xFF90CAF9), // Light blue
-            Colors.white,
-          ],
-          stops: [0.0, 0.1, 0.5], // More white dominance
-        ),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
       ),
 
       child: _isLoading && _allSeats.isEmpty 
@@ -160,32 +152,18 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                   padding: const EdgeInsets.only(top: 24.0, bottom: 12.0),
                   child: Column(
                     children: [
-                      Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(30),
-                            bottom: Radius.circular(30),
-                          ),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            height: 28,
-                            color: Colors.teal.shade700,
-                            alignment: Alignment.center,
-                            child: const Text(
-                              'Screen Area',
-                              style: TextStyle(
-                                color: Colors.brown,
-                                // fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                letterSpacing: 1.2,
-                              ),
+                      Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _legendItem(Colors.blueGrey.shade900, "Tersedia"),
+                                _legendItem(Colors.grey.shade400, "Tidak Tersedia"),
+                                _legendItem(Colors.blue.shade400, "Pilihanmu"),
+                              ],
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+                      // const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -216,9 +194,9 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                                   child: Text(
                                     seat.seatId,
                                     style: TextStyle(
-                                      color: _getSeatColor(seat) == Colors.black38 || _getSeatColor(seat) == Colors.grey
-                                          ? Colors.black54
-                                          : Colors.black87,
+                                      color: _getSeatColor(seat) == Colors.blueGrey.shade900 || _getSeatColor(seat) == Colors.blue.shade400 
+                                      ? Colors.white 
+                                      : Colors.grey.shade700,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
                                     ),
@@ -231,102 +209,112 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
 
                 ),
                 
-              if (_selectedSeatDocIds.isNotEmpty)  
-                Padding(
+              // if (_selectedSeatDocIds.isNotEmpty)  
+                Container(
                   padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                _legendItem(Colors.white10, "Available"),
-                                _legendItem(Colors.grey.shade800, "Selected"),
-                                _legendItem(Colors.brown, "Booked"),
+                                const Text(
+                                  'Total Harga',
+                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Rp ${totalPrice.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
                               ],
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                            // TEMPAT DUDUK column
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      selectedSeatNames.isEmpty ? "None" : selectedSeatNames,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                    const SizedBox(height: 4),
-                                  ],
-                                ),
-                              // TOTAL HARGA column
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Rp ${totalPrice.toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                        fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
+                          Container(
+                            height: 32,
+                            width: 1,
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            color: Colors.grey.shade400,
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      // backgroundColor: Colors.grey.shade400,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                    ),
-                                    onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
-                                        ? () {
-                                            setState(() {
-                                              _selectedSeatDocIds.clear();
-                                            });
-                                          }
-                                        : null,
-                                    child: const Text(
-                                      'Clear Picks',
-                                      style: TextStyle(fontSize: 16, color: Colors.black),
-                                    ),
-                                  ),
+                                const Text(
+                                  'Tempat Duduk',
+                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.teal.shade700,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                    ),
-                                    onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
-                                        ? () {
-                                            Navigator.pushNamed(context, 'ticketsummary');
-                                          }
-                                        : null,
-                                    child: const Text(
-                                      'Continue',
-                                      style: TextStyle(fontSize: 16, color: Colors.white),
-                                    ),
-                                  ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  selectedSeatNames.isEmpty ? "Kursi belum dipilih" : selectedSeatNames,
+                                  style: const TextStyle(fontSize: 12),
+                                  textAlign: TextAlign.center,
                                 ),
+                                const SizedBox(height: 4),
                               ],
                             ),
-                          ],
-                        ),
-                    ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Action buttons section
+                      Row(
+                        children: [
+                          // Expanded(
+                          //   child: ElevatedButton(
+                          //     style: ElevatedButton.styleFrom(
+                          //       padding: const EdgeInsets.symmetric(vertical: 12),
+                          //     ),
+                          //     onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
+                          //         ? () {
+                          //             setState(() {
+                          //               _selectedSeatDocIds.clear();
+                          //             });
+                          //           }
+                          //         : null,
+                          //     child: const Text(
+                          //       'Clear Picks',
+                          //       style: TextStyle(fontSize: 16, color: Colors.black),
+                          //     ),
+                          //   ),
+                          // ),
+
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: FilledButton(
+                              style: FilledButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero, // No curve
+                                ),
+                                backgroundColor: Colors.teal.shade700,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
+                                  ? () {
+                                      Navigator.pushNamed(context, 'ticketsummary');
+                                    }
+                                  : null,
+                              child: const Text(
+                                'RINGKASAN ORDER',
+                                style: TextStyle(fontSize: 16, color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                          
+                        ],
+                      ),
+                    ],
                   ),
-                ),
+                )
               ],
             ),
       ),

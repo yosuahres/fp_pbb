@@ -36,6 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
+      final user = FirebaseAuth.instance.currentUser;
+      final uid = user?.uid;
       navigateHome();
     } on FirebaseAuthException catch (e) {
       setState(() {

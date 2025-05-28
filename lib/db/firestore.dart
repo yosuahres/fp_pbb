@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
+  final CollectionReference users =
+      FirebaseFirestore.instance.collection('users');
+
+
+
   final CollectionReference seats =
       FirebaseFirestore.instance.collection('seats');
 
@@ -30,7 +35,6 @@ class FirestoreService {
   Future<void> initializeDefaultSeats(int rows, int cols) async {
     final QuerySnapshot existingSeats = await seats.limit(1).get();
     if (existingSeats.docs.isEmpty) {
-      print("Initializing default seats...");
       WriteBatch batch = FirebaseFirestore.instance.batch();
       for (int i = 0; i < rows; i++) {
         String rowChar = String.fromCharCode('A'.codeUnitAt(0) + i);
@@ -46,9 +50,7 @@ class FirestoreService {
         }
       }
       await batch.commit();
-      print("Default seats initialized.");
     } else {
-      print("Seats already exist. Skipping initialization.");
     }
   }
 
