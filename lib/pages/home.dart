@@ -91,7 +91,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () => _watchedMovie(movie),
                           ),
                           onTap:  () {
-                            Navigator.pushNamed(context, 'ticketseat');
+                            Navigator.pushNamed(context, 'ticketseat',
+                            arguments: {
+                              'movieId': movie.id.toString(),
+                              'movieName': movie.title,
+                              // 'posterPath': movie.posterPath,
+                              // 'overview': movie.overview,
+                            }
+                            );
                           },
                         );
                       },

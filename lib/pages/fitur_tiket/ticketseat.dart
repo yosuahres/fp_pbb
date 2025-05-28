@@ -15,6 +15,9 @@ class TicketSeatScreen extends StatefulWidget {
 
 class _TicketSeatScreenState extends State<TicketSeatScreen> {
   final FirestoreService _firestoreService = FirestoreService();
+  //get data;
+  late String movieId;
+  late String movieName;
 
   List<Seat> _allSeats = [];
   final List<String> _selectedSeatDocIds = []; 
@@ -28,16 +31,26 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   @override
   void initState() {
     super.initState();
+    // _LoadSeats();
+  }
+  
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments as Map?;
+    if (args != null) {
+      movieId = args['movieId'].toString() ?? '';
+      movieName = args['movieName'] ?? '';
+    }
     _LoadSeats();
   }
 
   Future<void> _LoadSeats() async {
-    await _firestoreService.initializeDefaultSeats(_numRows, _numCols);
+    await _firestoreService.initializeDefaultSeats(movieId, _numRows, _numCols);
     _loadSeats();
   }
 
   void _loadSeats() {
-    _firestoreService.getSeats().listen((snapshot) {
+    _firestoreService.getSeats(movieId).listen((snapshot) {
       if (snapshot.docs.isNotEmpty) {
         setState(() {
           _allSeats = snapshot.docs.map((doc) => Seat.fromFirestore(doc)).toList();
@@ -101,7 +114,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
       for (String seatDocId in _selectedSeatDocIds) {
         Seat s = _allSeats.firstWhere((seat) => seat.docId == seatDocId);
 
-        DocumentReference seatRef = _firestoreService.seats.doc(seatDocId);
+        DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
         batch.update(seatRef, {
           'status': 'booked',
           'userId': FirebaseAuth.instance.currentUser?.uid,
@@ -136,7 +149,12 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('nama tempat bioskop**'),
+        title: Text(
+          movieName.isNotEmpty ? movieName : 'Pilih Kursi',
+          style: const TextStyle(
+            fontSize: 18, 
+          ),
+        ),
         // backgroundColor: Colors.grey.shade50,
       ),
       body: Container(
@@ -149,20 +167,19 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
           : Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 24.0, bottom: 12.0),
+                  padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
                   child: Column(
                     children: [
-                      Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _legendItem(Colors.blueGrey.shade900, "Tersedia"),
-                                _legendItem(Colors.grey.shade400, "Tidak Tersedia"),
-                                _legendItem(Colors.blue.shade400, "Pilihanmu"),
-                              ],
-                            ),
-                          ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center, 
+                        children: [
+                          _legendItem(Colors.blueGrey.shade900, "Tersedia"),
+                          SizedBox(width: 18), 
+                          _legendItem(Colors.grey.shade400, "Tidak Tersedia"),
+                          SizedBox(width: 18),
+                          _legendItem(Colors.blue.shade400, "Pilihanmu"),
+                        ],
+                      ),
                       // const SizedBox(height: 8),
                         const Divider(
                         thickness: 1,
@@ -214,65 +231,63 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
 
                 // ),
 
-                // ...existing code...
-Expanded(
-  child: _allSeats.isEmpty && !_isLoading
-      ? const Center(child: Text("No seats available or failed to load."))
-      : Column(
-          children: [
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(16.0),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: _numCols,
-                  crossAxisSpacing: 8.0,
-                  mainAxisSpacing: 8.0,
-                  childAspectRatio: 1.2,
-                ),
-                itemCount: _allSeats.length,
-                itemBuilder: (context, index) {
-                  final seat = _allSeats[index];
-                  return InkWell(
-                    onTap: () => _onSeatTap(seat),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: _getSeatColor(seat),
-                        borderRadius: BorderRadius.circular(5.0),
-                        border: Border.all(color: Colors.black26),
-                      ),
-                      child: Center(
-                        child: Text(
-                          seat.seatId,
-                          style: TextStyle(
-                            color: _getSeatColor(seat) == Colors.blueGrey.shade900 ||
-                                    _getSeatColor(seat) == Colors.blue.shade400
-                                ? Colors.white
-                                : Colors.grey.shade700,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+                Expanded(
+                  child: _allSeats.isEmpty && !_isLoading
+                      ? const Center(child: Text("No seats available or failed to load."))
+                      : Column(
+                          children: [
+                            Expanded(
+                              child: GridView.builder(
+                                padding: const EdgeInsets.all(16.0),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: _numCols,
+                                  crossAxisSpacing: 8.0,
+                                  mainAxisSpacing: 8.0,
+                                  childAspectRatio: 1.2,
+                                ),
+                                itemCount: _allSeats.length,
+                                itemBuilder: (context, index) {
+                                  final seat = _allSeats[index];
+                                  return InkWell(
+                                    onTap: () => _onSeatTap(seat),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: _getSeatColor(seat),
+                                        borderRadius: BorderRadius.circular(5.0),
+                                        border: Border.all(color: Colors.black26),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          seat.seatId,
+                                          style: TextStyle(
+                                            color: _getSeatColor(seat) == Colors.blueGrey.shade900 ||
+                                                    _getSeatColor(seat) == Colors.blue.shade400
+                                                ? Colors.white
+                                                : Colors.grey.shade700,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            // Movie screen representation
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 60),
+                              child: SizedBox(
+                                height: 20,
+                                width: double.infinity,
+                                child: CustomPaint(
+                                  painter: MovieScreenPainter(),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            // Movie screen representation
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 60),
-              child: SizedBox(
-                height: 20,
-                width: double.infinity,
-                child: CustomPaint(
-                  painter: MovieScreenPainter(),
                 ),
-              ),
-            ),
-          ],
-        ),
-),
-// ...existing code...
                 
               // if (_selectedSeatDocIds.isNotEmpty)  
                 Container(
@@ -382,14 +397,16 @@ Expanded(
                             child: FilledButton(
                               style: FilledButton.styleFrom(
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.zero, // No curve
+                                  borderRadius: BorderRadius.zero, 
                                 ),
                                 backgroundColor: Colors.blueGrey.shade900,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                               ),
                               onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
                                   ? () {
-                                      Navigator.pushNamed(context, 'ticketsummary');
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        Navigator.pushNamed(context, 'ticketsummary');
+                                      });
                                     }
                                   : null,
                               child: Text(
@@ -414,7 +431,12 @@ Expanded(
     return Row(
       children: [
         Container(width: 15, height: 15, color: color, margin: const EdgeInsets.only(right: 6)),
-        Text(text),
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 12,
+          ),
+          ),
       ],
     );
   }
@@ -428,17 +450,15 @@ class MovieScreenPainter extends CustomPainter {
       ..strokeWidth = 6
       ..style = PaintingStyle.stroke;
 
-    // Draw a simple arc (curve) facing up (towards the seats)
     final rect = Rect.fromLTWH(0, 0, size.width, size.height * 2);
     canvas.drawArc(
       rect,
-      math.pi, // Start at 180 degrees (left)
-      -math.pi, // Sweep -180 degrees (to right, facing up)
+      math.pi, 
+      -math.pi, 
       false,
       paint,
     );
 
-    // Draw "SCREEN" text above the curve, centered
     final textPainter = TextPainter(
       text: TextSpan(
         text: "LAYAR BIOSKOP",
