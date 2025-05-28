@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalpbb/db/firestore.dart'; 
 import 'package:finalpbb/models/seat_model.dart';
+import 'dart:math' as math;
 
 class TicketSeatScreen extends StatefulWidget {
   const TicketSeatScreen({Key? key}) : super(key: key);
@@ -147,7 +148,6 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // screen movie icon
                 Padding(
                   padding: const EdgeInsets.only(top: 24.0, bottom: 12.0),
                   child: Column(
@@ -164,50 +164,115 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                             ),
                           ),
                       // const SizedBox(height: 8),
+                        const Divider(
+                        thickness: 1,
+                        color: Colors.grey,
+                        height: 24,
+                      ),
                     ],
                   ),
                 ),
                 
-                Expanded(
-                  child: _allSeats.isEmpty && !_isLoading
-                      ? const Center(child: Text("No seats available or failed to load."))
-                      : GridView.builder(
-                          padding: const EdgeInsets.all(16.0),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: _numCols, 
-                            crossAxisSpacing: 8.0,
-                            mainAxisSpacing: 8.0,
-                            childAspectRatio: 1.2, 
-                          ),
-                          itemCount: _allSeats.length,
-                          itemBuilder: (context, index) {
-                            final seat = _allSeats[index];
-                            return InkWell(
-                              onTap: () => _onSeatTap(seat),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: _getSeatColor(seat),
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  border: Border.all(color: Colors.black26),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    seat.seatId,
-                                    style: TextStyle(
-                                      color: _getSeatColor(seat) == Colors.blueGrey.shade900 || _getSeatColor(seat) == Colors.blue.shade400 
-                                      ? Colors.white 
-                                      : Colors.grey.shade700,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                // Expanded(
+                //   child: _allSeats.isEmpty && !_isLoading
+                //       ? const Center(child: Text("No seats available or failed to load."))
+                //       : GridView.builder(
+                //           padding: const EdgeInsets.all(16.0),
+                //           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //             crossAxisCount: _numCols, 
+                //             crossAxisSpacing: 8.0,
+                //             mainAxisSpacing: 8.0,
+                //             childAspectRatio: 1.2, 
+                //           ),
+                //           itemCount: _allSeats.length,
+                //           itemBuilder: (context, index) {
+                //             final seat = _allSeats[index];
+                //             return InkWell(
+                //               onTap: () => _onSeatTap(seat),
+                //               child: Container(
+                //                 decoration: BoxDecoration(
+                //                   color: _getSeatColor(seat),
+                //                   borderRadius: BorderRadius.circular(5.0),
+                //                   border: Border.all(color: Colors.black26),
+                //                 ),
+                //                 child: Center(
+                //                   child: Text(
+                //                     seat.seatId,
+                //                     style: TextStyle(
+                //                       color: _getSeatColor(seat) == Colors.blueGrey.shade900 || _getSeatColor(seat) == Colors.blue.shade400 
+                //                       ? Colors.white 
+                //                       : Colors.grey.shade700,
+                //                       fontWeight: FontWeight.bold,
+                //                       fontSize: 12,
+                //                     ),
+                //                   ),
+                //                 ),
+                //               ),
+                //             );
+                //           },
+                //         ),
 
+                // ),
+
+                // ...existing code...
+Expanded(
+  child: _allSeats.isEmpty && !_isLoading
+      ? const Center(child: Text("No seats available or failed to load."))
+      : Column(
+          children: [
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16.0),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _numCols,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                  childAspectRatio: 1.2,
                 ),
+                itemCount: _allSeats.length,
+                itemBuilder: (context, index) {
+                  final seat = _allSeats[index];
+                  return InkWell(
+                    onTap: () => _onSeatTap(seat),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _getSeatColor(seat),
+                        borderRadius: BorderRadius.circular(5.0),
+                        border: Border.all(color: Colors.black26),
+                      ),
+                      child: Center(
+                        child: Text(
+                          seat.seatId,
+                          style: TextStyle(
+                            color: _getSeatColor(seat) == Colors.blueGrey.shade900 ||
+                                    _getSeatColor(seat) == Colors.blue.shade400
+                                ? Colors.white
+                                : Colors.grey.shade700,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            // Movie screen representation
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 60),
+              child: SizedBox(
+                height: 20,
+                width: double.infinity,
+                child: CustomPaint(
+                  painter: MovieScreenPainter(),
+                ),
+              ),
+            ),
+          ],
+        ),
+),
+// ...existing code...
                 
               // if (_selectedSeatDocIds.isNotEmpty)  
                 Container(
@@ -244,25 +309,49 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                             margin: const EdgeInsets.symmetric(horizontal: 16),
                             color: Colors.grey.shade400,
                           ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Tempat Duduk',
-                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  selectedSeatNames.isEmpty ? "Kursi belum dipilih" : selectedSeatNames,
-                                  style: const TextStyle(fontSize: 12),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                            ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Tempat Duduk',
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 8),
+                              currentlySelectedSeats.isEmpty
+                                  ? const Text(
+                                      "Kursi belum dipilih",
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    )
+                                  : Wrap(
+                                      spacing: 6,
+                                      runSpacing: 6,
+                                      alignment: WrapAlignment.center,
+                                      children: currentlySelectedSeats.map((seat) {
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blueGrey.shade900,
+                                            borderRadius: BorderRadius.circular(5.0),
+                                            border: Border.all(color: Colors.black26),
+                                          ),
+                                          child: Text(
+                                            seat.seatId,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                              const SizedBox(height: 4),
+                            ],
                           ),
+                        ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -295,7 +384,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.zero, // No curve
                                 ),
-                                backgroundColor: Colors.teal.shade700,
+                                backgroundColor: Colors.blueGrey.shade900,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                               ),
                               onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
@@ -303,9 +392,9 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                                       Navigator.pushNamed(context, 'ticketsummary');
                                     }
                                   : null,
-                              child: const Text(
+                              child: Text(
                                 'RINGKASAN ORDER',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
+                                style: TextStyle(fontSize: 14, color: Colors.yellow.shade700),
                               ),
                             ),
                           ),
@@ -329,4 +418,47 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
       ],
     );
   }
+}
+
+class MovieScreenPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey.shade700
+      ..strokeWidth = 6
+      ..style = PaintingStyle.stroke;
+
+    // Draw a simple arc (curve) facing up (towards the seats)
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height * 2);
+    canvas.drawArc(
+      rect,
+      math.pi, // Start at 180 degrees (left)
+      -math.pi, // Sweep -180 degrees (to right, facing up)
+      false,
+      paint,
+    );
+
+    // Draw "SCREEN" text above the curve, centered
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: "LAYAR BIOSKOP",
+        style: TextStyle(
+          color: Colors.grey.shade700,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+          // letterSpacing: 2,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
+    textPainter.layout(minWidth: 0, maxWidth: size.width);
+    textPainter.paint(
+      canvas,
+      Offset((size.width - textPainter.width) / 2, 0),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

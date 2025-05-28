@@ -15,8 +15,10 @@ class _TicketseatState extends State<TicketSummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("summary"),
+      ),
     );
   }
 }
