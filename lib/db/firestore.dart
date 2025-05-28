@@ -1,18 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
-  final CollectionReference users =
-      FirebaseFirestore.instance.collection('users');
+  // final CollectionReference users =
+  //     FirebaseFirestore.instance.collection('users');
 
+  // // --- USER MANAGEMENT ---
 
 
   final CollectionReference seats =
       FirebaseFirestore.instance.collection('seats');
 
+  CollectionReference getSeatsCollection(String movieId) {
+    return FirebaseFirestore.instance.collection('movies').doc(movieId).collection('seats');
+  }    
+
   // --- SEAT MANAGEMENT ---
 
-  Stream<QuerySnapshot> getSeats() {
-    return seats.orderBy('seatId').snapshots(); 
+
+  Stream<QuerySnapshot> getSeats(String movieId) {
+    return getSeatsCollection(movieId).orderBy('seatId').snapshots();
   }
 
   Future<void> updateSeatStatus(String seatDocId, String newStatus, String? userId) {
@@ -32,15 +38,16 @@ class FirestoreService {
     });
   }
 
-  Future<void> initializeDefaultSeats(int rows, int cols) async {
-    final QuerySnapshot existingSeats = await seats.limit(1).get();
+  Future<void> initializeDefaultSeats(String movieId, int rows, int cols) async {
+    final seatsCollection = getSeatsCollection(movieId);
+    final QuerySnapshot existingSeats = await seatsCollection.limit(1).get();
     if (existingSeats.docs.isEmpty) {
       WriteBatch batch = FirebaseFirestore.instance.batch();
       for (int i = 0; i < rows; i++) {
         String rowChar = String.fromCharCode('A'.codeUnitAt(0) + i);
         for (int j = 1; j <= cols; j++) {
           String seatId = '$rowChar$j';
-          DocumentReference seatRef = seats.doc(seatId);
+          DocumentReference seatRef = seatsCollection.doc(seatId);
           batch.set(seatRef, {
             'seatId': seatId,
             'status': 'available',
@@ -50,7 +57,6 @@ class FirestoreService {
         }
       }
       await batch.commit();
-    } else {
     }
   }
 
