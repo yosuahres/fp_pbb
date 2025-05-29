@@ -67,16 +67,13 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error loading seats: $error")),
+        SnackBar(content: Text("bad: $error")),
       );
     });
   }
 
   void _onSeatTap(Seat seat) {
     if (seat.status == 'booked') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${seat.seatId} is already booked.')),
-      );
       return;
     }
 
@@ -102,7 +99,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   Future<void> _bookSelectedSeats() async {
     if (_selectedSeatDocIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one seat.')),
+        const SnackBar(content: Text('Pilih salah satu kursi terlebih dahulu.')),
       );
       return;
     }
@@ -123,9 +120,6 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
       }
       await batch.commit();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_selectedSeatDocIds.length} seat(s) booked successfully!')),
-      );
       setState(() {
         _selectedSeatDocIds.clear(); 
         _isLoading = false;
@@ -133,7 +127,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error booking seats: $e')),
+        SnackBar(content: Text('bad: $e')),
       );
       setState(() { _isLoading = false; });
     }
@@ -233,7 +227,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
 
                 Expanded(
                   child: _allSeats.isEmpty && !_isLoading
-                      ? const Center(child: Text("No seats available or failed to load."))
+                      ? const Center(child: Text("bad"))
                       : Column(
                           children: [
                             Expanded(
@@ -402,13 +396,23 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                                 backgroundColor: Colors.blueGrey.shade900,
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                               ),
-                              onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
-                                  ? () {
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        Navigator.pushNamed(context, 'ticketsummary');
-                                      });
-                                    }
-                                  : null,
+                                onPressed: _selectedSeatDocIds.isNotEmpty && !_isLoading
+                                    ? () {
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                          Navigator.pushNamed(
+                                            context,
+                                            'ticketsummary',
+                                            arguments: {
+                                              'movieId': movieId,
+                                              'movieName': movieName,
+                                              'selectedSeats': currentlySelectedSeats.map((s) => s.seatId).toList(),
+                                              'seatDocIds': _selectedSeatDocIds,
+                                              'totalPrice': totalPrice,
+                                            },
+                                          );
+                                        });
+                                      }
+                                    : null,
                               child: Text(
                                 'RINGKASAN ORDER',
                                 style: TextStyle(fontSize: 14, color: Colors.yellow.shade700),
