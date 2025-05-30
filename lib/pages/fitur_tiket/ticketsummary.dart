@@ -13,8 +13,11 @@ class TicketSummaryScreen extends StatefulWidget {
 class _TicketseatState extends State<TicketSummaryScreen> {
   final FirestoreService _firestoreService = FirestoreService();
 
+  //get parsing data dari TicketSeatScreen
   late String movieId;
   late String movieName;
+  late String posterPath;
+
   late List<String> selectedSeats;
   late List<String> seatDocIds;
   late double totalPrice;
@@ -22,6 +25,8 @@ class _TicketseatState extends State<TicketSummaryScreen> {
   bool _isProcessing = false;
 
   @override
+
+  //init data
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
@@ -31,12 +36,14 @@ class _TicketseatState extends State<TicketSummaryScreen> {
       selectedSeats = List<String>.from(args['selectedSeats'] ?? []);
       seatDocIds = List<String>.from(args['seatDocIds'] ?? []);
       totalPrice = args['totalPrice'] ?? 0.0;
+      posterPath = args['posterPath'] ?? '';
     } else {
       movieId = '';
       movieName = '';
       selectedSeats = [];
       seatDocIds = [];
       totalPrice = 0.0;
+      posterPath = '';
     }
   }
 
@@ -84,7 +91,36 @@ class _TicketseatState extends State<TicketSummaryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Movie: $movieName", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (posterPath.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      'https://image.tmdb.org/t/p/w200$posterPath',
+                      width: 80,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 80,
+                        height: 120,
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.broken_image, size: 40),
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    "Movie: $movieName",
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             Text("Kursi: ${selectedSeats.join(', ')}", style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 16),
