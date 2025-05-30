@@ -18,6 +18,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   //get data;
   late String movieId;
   late String movieName;
+  late String posterPath;
 
   List<Seat> _allSeats = [];
   final List<String> _selectedSeatDocIds = []; 
@@ -40,6 +41,7 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
     if (args != null) {
       movieId = args['movieId'].toString() ?? '';
       movieName = args['movieName'] ?? '';
+      posterPath = args['posterPath'] ?? '';
     }
     _LoadSeats();
   }
@@ -403,11 +405,13 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                                             context,
                                             'ticketsummary',
                                             arguments: {
+                                              //parsing data
                                               'movieId': movieId,
                                               'movieName': movieName,
                                               'selectedSeats': currentlySelectedSeats.map((s) => s.seatId).toList(),
                                               'seatDocIds': _selectedSeatDocIds,
                                               'totalPrice': totalPrice,
+                                              'posterPath': posterPath,
                                             },
                                           );
                                         });
