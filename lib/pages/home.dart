@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             arguments: {
                               'movieId': movie.id.toString(),
                               'movieName': movie.title,
-                              // 'posterPath': movie.posterPath,
+                              'posterPath': movie.posterPath,
                               // 'overview': movie.overview,
                             }
                             );

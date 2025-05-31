@@ -1,11 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
-  // final CollectionReference users =
-  //     FirebaseFirestore.instance.collection('users');
+  final CollectionReference users =
+      FirebaseFirestore.instance.collection('users');
 
   // // --- USER MANAGEMENT ---
 
+  Future<void> addUser(String userId, String email, String username) {
+    return users.doc(userId).set({
+      'email': email,
+      'username': username,
+      'timestamp': Timestamp.now(),
+    });
+  }
+
+  Future<DocumentSnapshot> getUser(String userId) {
+    return users.doc(userId).get();
+  }
+
+  Future<void> updateUser(String userId, String email, String username) {
+    return users.doc(userId).update({
+      'email': email,
+      'username': username,
+      'timestamp': Timestamp.now(),
+    });
+  }
+
+  Future<void> deleteUser(String userId) {
+    return users.doc(userId).delete();
+  }
 
   final CollectionReference seats =
       FirebaseFirestore.instance.collection('seats');
