@@ -268,6 +268,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
+
+                      const SizedBox(height: 12),
+                        Center(
+                          child: TextButton(
+                            onPressed: navigateHome,
+                            child: const Text(
+                              'Back to Home',
+                              style: TextStyle(
+                                color: Color(0xFF4A0072),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+
                     ],
                   ),
                 ),
