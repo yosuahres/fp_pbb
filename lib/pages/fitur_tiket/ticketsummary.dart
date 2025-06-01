@@ -47,32 +47,40 @@ class _TicketseatState extends State<TicketSummaryScreen> {
     }
   }
 
-  Future<void> _confirmOrder() async {
-    setState(() { _isProcessing = true; });
+Future<void> _confirmOrder() async {
+  setState(() { _isProcessing = true; });
 
-    try {
-      WriteBatch batch = FirebaseFirestore.instance.batch();
-      for (String seatDocId in seatDocIds) {
-        DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
-        batch.update(seatRef, {
-          'status': 'booked',
-          'userId': FirebaseAuth.instance.currentUser?.uid,
-          'timestamp': Timestamp.now(),
-        });
-      }
-      await batch.commit();
-
-      //
-
-      Navigator.popUntil(context, ModalRoute.withName('home'));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('bad: $e')),
-      );
-    } finally {
-      setState(() { _isProcessing = false; });
+  try {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    for (String seatDocId in seatDocIds) {
+      DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
+      batch.update(seatRef, {
+        'status': 'booked',
+        'userId': FirebaseAuth.instance.currentUser?.uid,
+        'timestamp': Timestamp.now(),
+      });
     }
+    await batch.commit();
+
+    await FirebaseFirestore.instance.collection('orders').add({
+      'userId': FirebaseAuth.instance.currentUser?.uid,
+      'movieId': movieId,
+      'movieName': movieName,
+      'posterPath': posterPath,
+      'selectedSeats': selectedSeats,
+      'totalPrice': totalPrice,
+      'timestamp': Timestamp.now(),
+    });
+
+    Navigator.popUntil(context, ModalRoute.withName('home'));
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('bad: $e')),
+    );
+  } finally {
+    setState(() { _isProcessing = false; });
   }
+}
 
   @override
   Widget build(BuildContext context) {
