@@ -121,20 +121,86 @@ class _TicketseatState extends State<TicketSummaryScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Text("Kursi: ${selectedSeats.join(', ')}", style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 16),
-            Text("Total Harga: Rp ${totalPrice.toStringAsFixed(0)}", style: const TextStyle(fontSize: 16)),
+      
+        const SizedBox(height: 24),
+        const Divider(height: 1, color: Color(0xFFEEEEEE)),
+        const SizedBox(height: 24),
+
+          const Text(
+            'Detail Transaksi',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${selectedSeats.length} x Tiket',
+                style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+              ),
+              Text(
+                selectedSeats.join(', ').toUpperCase(),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Harga',
+                style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+              ),
+              Text(
+                'Rp ${totalPrice.toStringAsFixed(0)}',
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+          const Divider(height: 1, color: Color(0xFFEEEEEE)),
+          const SizedBox(height: 24),
+
+
+            // const SizedBox(height: 16),
+            // Text("Kursi: ${selectedSeats.join(', ')}", style: const TextStyle(fontSize: 16)),
+            // const SizedBox(height: 16),
+            // Text("Total Harga: Rp ${totalPrice.toStringAsFixed(0)}", style: const TextStyle(fontSize: 16)),
             const Spacer(),
             SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isProcessing ? null : _confirmOrder,
-                child: _isProcessing
-                    ? const CircularProgressIndicator()
-                    : const Text("Konfirmasi Order"),
-              ),
-            ),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[700],
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: _isProcessing ? null : _confirmOrder,
+                        child: _isProcessing
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : const Text(
+                                "Konfrimasi Tiket",
+                                style: TextStyle(fontSize: 16, color: Colors.white),
+                              ),
+                      ),
+                ),
           ],
         ),
       ),
