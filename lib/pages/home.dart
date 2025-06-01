@@ -4,6 +4,7 @@ import 'package:finalpbb/services/api_service.dart';
 import 'package:finalpbb/models/movie_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -134,7 +135,46 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               );
       case 1:
-        return const Center(child: Text('My Orders'));
+          return StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, userSnapshot) {
+              final user = userSnapshot.data;
+              if (user == null) {
+                return const Center(child: Text('Please login to see your orders.'));
+              }
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('orders')
+                    .where('userId', isEqualTo: user.uid)
+                    .orderBy('timestamp', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final docs = snapshot.data!.docs;
+                  if (docs.isEmpty) {
+                    return const Center(child: Text('Belum ada pesanan.'));
+                  }
+                  return ListView.builder(
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      final data = docs[index].data() as Map<String, dynamic>;
+                      return ListTile(
+                        leading: data['posterPath'] != null && data['posterPath'] != ''
+                            ? Image.network('https://image.tmdb.org/t/p/w200${data['posterPath']}', width: 50)
+                            : const Icon(Icons.movie),
+                        title: Text(data['movieName'] ?? ''),
+                        subtitle: Text('Kursi: ${(data['selectedSeats'] as List).join(', ')}\nTotal: Rp${data['totalPrice']}'),
+                        isThreeLine: true,
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+
       case 2:
         return const Center(child: Text('Promos'));
       case 3:
