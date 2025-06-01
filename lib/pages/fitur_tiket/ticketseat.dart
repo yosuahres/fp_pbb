@@ -143,6 +143,27 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
     String selectedSeatNames = currentlySelectedSeats.map((s) => s.seatId).join(', ');
     double totalPrice = currentlySelectedSeats.length * _seatPrice;
 
+
+    //login ora
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (!snapshot.hasData) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacementNamed(
+            context,
+            'home',
+            arguments: {'tab': 3},
+          );
+        });
+        return const SizedBox(); 
+      }
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -432,6 +453,8 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
               ],
             ),
       ),
+    );
+      },
     );
   }
 
