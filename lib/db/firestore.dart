@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
-  final CollectionReference users =
-      FirebaseFirestore.instance.collection('users');
+  final CollectionReference users = FirebaseFirestore.instance.collection(
+    'users',
+  );
 
   // // --- USER MANAGEMENT ---
 
@@ -30,24 +31,31 @@ class FirestoreService {
     return users.doc(userId).delete();
   }
 
-  final CollectionReference seats =
-      FirebaseFirestore.instance.collection('seats');
+  final CollectionReference seats = FirebaseFirestore.instance.collection(
+    'seats',
+  );
 
   CollectionReference getSeatsCollection(String movieId) {
-    return FirebaseFirestore.instance.collection('movies').doc(movieId).collection('seats');
-  }    
+    return FirebaseFirestore.instance
+        .collection('movies')
+        .doc(movieId)
+        .collection('seats');
+  }
 
   // --- SEAT MANAGEMENT ---
-
 
   Stream<QuerySnapshot> getSeats(String movieId) {
     return getSeatsCollection(movieId).orderBy('seatId').snapshots();
   }
 
-  Future<void> updateSeatStatus(String seatDocId, String newStatus, String? userId) {
+  Future<void> updateSeatStatus(
+    String seatDocId,
+    String newStatus,
+    String? userId,
+  ) {
     return seats.doc(seatDocId).update({
       'status': newStatus,
-      'userId': newStatus == 'booked' ? userId : null, 
+      'userId': newStatus == 'booked' ? userId : null,
       'timestamp': Timestamp.now(),
     });
   }
@@ -55,13 +63,17 @@ class FirestoreService {
   Future<void> addSeat(String seatId, String status) {
     return seats.add({
       'seatId': seatId,
-      'status': status, 
-      'userId': null,  
+      'status': status,
+      'userId': null,
       'timestamp': Timestamp.now(),
     });
   }
 
-  Future<void> initializeDefaultSeats(String movieId, int rows, int cols) async {
+  Future<void> initializeDefaultSeats(
+    String movieId,
+    int rows,
+    int cols,
+  ) async {
     final seatsCollection = getSeatsCollection(movieId);
     final QuerySnapshot existingSeats = await seatsCollection.limit(1).get();
     if (existingSeats.docs.isEmpty) {
@@ -85,10 +97,16 @@ class FirestoreService {
 
   // --- MOVIE MANAGEMENT ---
 
-  final CollectionReference movie =
-      FirebaseFirestore.instance.collection('movie');
+  final CollectionReference movie = FirebaseFirestore.instance.collection(
+    'movie',
+  );
 
-  Future<void> addWatchedMovie(int movieId, String title, String posterPath, String overview) {
+  Future<void> addWatchedMovie(
+    int movieId,
+    String title,
+    String posterPath,
+    String overview,
+  ) {
     return movie.add({
       'movieId': movieId,
       'title': title,
@@ -102,14 +120,23 @@ class FirestoreService {
     return movie.orderBy('timestamp', descending: true).snapshots();
   }
 
-  Future<void> updateWatchedMovie(String docId, String comment) { 
+  Future<void> updateWatchedMovie(String docId, String comment) {
     return movie.doc(docId).update({
       'comment': comment,
       'timestamp': Timestamp.now(),
     });
   }
 
-  Future<void> deleteWatchedMovie(String docId) { 
+  Future<void> deleteWatchedMovie(String docId) {
     return movie.doc(docId).delete();
+  }
+
+  Future<bool> isMovieInWatchlist(int movieId) async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('watchlist')
+            .where('movieId', isEqualTo: movieId)
+            .get();
+    return snapshot.docs.isNotEmpty;
   }
 }

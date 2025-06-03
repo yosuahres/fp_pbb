@@ -27,7 +27,10 @@ class watchlistScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                await _firestoreService.updateWatchedMovie(movieId, commentController.text);
+                await _firestoreService.updateWatchedMovie(
+                  movieId,
+                  commentController.text,
+                );
                 Navigator.of(context).pop();
               },
               child: const Text('Submit'),
@@ -41,10 +44,7 @@ class watchlistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Watched Movies'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Watched Movies'), centerTitle: true),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestoreService.getWatchedMovie(),
         builder: (context, snapshot) {
@@ -54,7 +54,9 @@ class watchlistScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final data = docs[index].data() as Map<String, dynamic>;
               return ListTile(
-                leading: Image.network('https://image.tmdb.org/t/p/w92${data['posterPath']}'),
+                leading: Image.network(
+                  'https://image.tmdb.org/t/p/w92${data['posterPath']}',
+                ),
 
                 title: Text(data['title'] ?? 'No Title'),
 
@@ -71,7 +73,10 @@ class watchlistScreen extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 4.0),
                         child: Text(
                           'Comment: ${data['comment']}',
-                          style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                          style: const TextStyle(
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey,
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -85,17 +90,19 @@ class watchlistScreen extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () async {
-                        await _firestoreService.deleteWatchedMovie(docs[index].id);
+                        await _firestoreService.deleteWatchedMovie(
+                          docs[index].id,
+                        );
                       },
-                    ),             
+                    ),
                     IconButton(
-                      icon: const Icon(Icons.plus_one),
+                      icon: const Icon(Icons.comment),
                       onPressed: () async {
                         showCommentDialog(context, docs[index].id);
                       },
-                    ),     
+                    ),
                   ],
-                )
+                ),
               );
             },
           );
