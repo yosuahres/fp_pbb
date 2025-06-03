@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Movie> _movies = [];
   bool _isLoading = true;
   final FirestoreService firestoreService = FirestoreService();
-  int status = 0; 
+  int status = 0;
 
   @override
   void initState() {
@@ -45,15 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacementNamed(context, 'login');
-  }
-
-  void _watchedMovie(Movie movie) async {
-    await firestoreService.addWatchedMovie(
-      movie.id,
-      movie.title,
-      movie.posterPath,
-      movie.overview,
-    );
   }
 
   Widget _profile() {
@@ -107,73 +98,88 @@ class _HomeScreenState extends State<HomeScreen> {
         return _isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView.builder(
-                itemCount: _movies.length,
-                itemBuilder: (context, index) {
-                  final movie = _movies[index];
-                  return ListTile(
-                    leading: movie.posterPath.isNotEmpty
-                        ? Image.network(movie.posterUrl)
-                        : const SizedBox(width: 50),
-                    title: Text(movie.title),
-                    subtitle: Text(
-                      movie.overview,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.heart_broken),
-                      onPressed: () => _watchedMovie(movie),
-                    ),
-                    onTap: () {
-                      Navigator.pushNamed(context, 'ticketseat', arguments: {
+              itemCount: _movies.length,
+              itemBuilder: (context, index) {
+                final movie = _movies[index];
+                return ListTile(
+                  leading:
+                      movie.posterPath.isNotEmpty
+                          ? Image.network(movie.posterUrl)
+                          : const SizedBox(width: 50),
+                  title: Text(movie.title),
+                  subtitle: Text(
+                    movie.overview,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  // trailing: IconButton(
+                  //   icon: const Icon(Icons.favorite),
+                  //   onPressed: () => _watchedMovie(movie),
+                  // ),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      'movie',
+                      arguments: {
                         'movieId': movie.id.toString(),
                         'movieName': movie.title,
                         'posterPath': movie.posterPath,
-                      });
-                    },
-                  );
-                },
-              );
+                        'overview': movie.overview,
+                      },
+                    );
+                  },
+                );
+              },
+            );
       case 1:
-          return StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, userSnapshot) {
-              final user = userSnapshot.data;
-              if (user == null) {
-                return const Center(child: Text('Please login to see your orders.'));
-              }
-              return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('orders')
-                    .where('userId', isEqualTo: user.uid)
-                    .orderBy('timestamp', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final docs = snapshot.data!.docs;
-                  if (docs.isEmpty) {
-                    return const Center(child: Text('Belum ada pesanan.'));
-                  }
-                  return ListView.builder(
-                    itemCount: docs.length,
-                    itemBuilder: (context, index) {
-                      final data = docs[index].data() as Map<String, dynamic>;
-                      return ListTile(
-                        leading: data['posterPath'] != null && data['posterPath'] != ''
-                            ? Image.network('https://image.tmdb.org/t/p/w200${data['posterPath']}', width: 50)
-                            : const Icon(Icons.movie),
-                        title: Text(data['movieName'] ?? ''),
-                        subtitle: Text('Kursi: ${(data['selectedSeats'] as List).join(', ')}\nTotal: Rp${data['totalPrice']}'),
-                        isThreeLine: true,
-                      );
-                    },
-                  );
-                },
+        return StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, userSnapshot) {
+            final user = userSnapshot.data;
+            if (user == null) {
+              return const Center(
+                child: Text('Please login to see your orders.'),
               );
-            },
-          );
+            }
+            return StreamBuilder<QuerySnapshot>(
+              stream:
+                  FirebaseFirestore.instance
+                      .collection('orders')
+                      .where('userId', isEqualTo: user.uid)
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final docs = snapshot.data!.docs;
+                if (docs.isEmpty) {
+                  return const Center(child: Text('Belum ada pesanan.'));
+                }
+                return ListView.builder(
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final data = docs[index].data() as Map<String, dynamic>;
+                    return ListTile(
+                      leading:
+                          data['posterPath'] != null && data['posterPath'] != ''
+                              ? Image.network(
+                                'https://image.tmdb.org/t/p/w200${data['posterPath']}',
+                                width: 50,
+                              )
+                              : const Icon(Icons.movie),
+                      title: Text(data['movieName'] ?? ''),
+                      subtitle: Text(
+                        'Kursi: ${(data['selectedSeats'] as List).join(', ')}\nTotal: Rp${data['totalPrice']}',
+                      ),
+                      isThreeLine: true,
+                    );
+                  },
+                );
+              },
+            );
+          },
+        );
 
       case 2:
         return const Center(child: Text('Promos'));
@@ -193,80 +199,85 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // return StreamBuilder<User?>(
-      // stream: FirebaseAuth.instance.authStateChanges(),
-      // builder: (context, snapshot) {
-        // if (snapshot.hasData) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Popular Movies'),
-              centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.logout),
-                  onPressed: () => _logout(context),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.history),
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'watchlist');
-                  },
-              ),
-              ],
-            ),
-            body:_bottomNavBar(),
-            bottomNavigationBar: BottomNavigationBar(
-              backgroundColor: Colors.black,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.black,
-              currentIndex: status,
-              onTap: _tempStatus,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Movies'),
-                BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'My Orders'),
-                BottomNavigationBarItem(icon: Icon(Icons.local_offer), label: 'Promos'),
-                BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-              ],
-            ),
-                // _isLoading
-                //     ? const Center(child: CircularProgressIndicator())
-                //     : ListView.builder(
-                //       itemCount: _movies.length,
-                //       itemBuilder: (context, index) {
-                //         final movie = _movies[index];
-                //         return ListTile(
-                //           leading:
-                //               movie.posterPath.isNotEmpty
-                //                   ? Image.network(movie.posterUrl)
-                //                   : const SizedBox(width: 50),
-                //           title: Text(movie.title),
-                //           subtitle: Text(
-                //             movie.overview,
-                //             maxLines: 2,
-                //             overflow: TextOverflow.ellipsis,
-                //           ),
-                //           trailing: IconButton(
-                //             icon: const Icon(Icons.heart_broken),
-                //             onPressed: () => _watchedMovie(movie),
-                //           ),
-                //           onTap:  () {
-                //             Navigator.pushNamed(context, 'ticketseat',
-                //             arguments: {
-                //               'movieId': movie.id.toString(),
-                //               'movieName': movie.title,
-                //               'posterPath': movie.posterPath,
-                //               // 'overview': movie.overview,
-                //             }
-                //             );
-                //           },
-                //         );
-                //       },
-                //     ),
-          );
-        // } else {
-        //   return const LoginScreen();
-        // }
-      // },
+    // stream: FirebaseAuth.instance.authStateChanges(),
+    // builder: (context, snapshot) {
+    // if (snapshot.hasData) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Popular Movies'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.pushNamed(context, 'watchlist');
+            },
+          ),
+        ],
+      ),
+      body: _bottomNavBar(),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        currentIndex: status,
+        onTap: _tempStatus,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Movies'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: 'My Orders',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_offer),
+            label: 'Promos',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+      // _isLoading
+      //     ? const Center(child: CircularProgressIndicator())
+      //     : ListView.builder(
+      //       itemCount: _movies.length,
+      //       itemBuilder: (context, index) {
+      //         final movie = _movies[index];
+      //         return ListTile(
+      //           leading:
+      //               movie.posterPath.isNotEmpty
+      //                   ? Image.network(movie.posterUrl)
+      //                   : const SizedBox(width: 50),
+      //           title: Text(movie.title),
+      //           subtitle: Text(
+      //             movie.overview,
+      //             maxLines: 2,
+      //             overflow: TextOverflow.ellipsis,
+      //           ),
+      //           trailing: IconButton(
+      //             icon: const Icon(Icons.heart_broken),
+      //             onPressed: () => _watchedMovie(movie),
+      //           ),
+      //           onTap:  () {
+      //             Navigator.pushNamed(context, 'ticketseat',
+      //             arguments: {
+      //               'movieId': movie.id.toString(),
+      //               'movieName': movie.title,
+      //               'posterPath': movie.posterPath,
+      //               // 'overview': movie.overview,
+      //             }
+      //             );
+      //           },
+      //         );
+      //       },
+      //     ),
+    );
+    // } else {
+    //   return const LoginScreen();
+    // }
+    // },
     // );
   }
 }
-
