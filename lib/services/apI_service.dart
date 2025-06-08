@@ -13,6 +13,7 @@ class ApiService {
     'Content-Type': 'application/json;charset=utf-8',
   };
 
+
   static Future<List<Movie>?> fetchPopularMovies({int page = 1}) async {
     final uri = Uri.parse(
       '$_baseUrl/movie/popular?api_key=$_apiKey&page=$page',
