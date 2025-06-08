@@ -27,7 +27,7 @@ class watchlistScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () async {
-                await _firestoreService.updateWatchedMovie(
+                await _firestoreService.updateWatchlistMovie(
                   movieId,
                   commentController.text,
                 );
@@ -44,9 +44,9 @@ class watchlistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Watched Movies'), centerTitle: true),
+      appBar: AppBar(title: const Text('Watchlist Movies'), centerTitle: true),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestoreService.getWatchedMovie(),
+        stream: _firestoreService.getWatchlistMovie(),
         builder: (context, snapshot) {
           final docs = snapshot.data?.docs ?? [];
           return ListView.builder(
@@ -90,7 +90,7 @@ class watchlistScreen extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () async {
-                        await _firestoreService.deleteWatchedMovie(
+                        await _firestoreService.deleteWatchlistMovie(
                           docs[index].id,
                         );
                       },

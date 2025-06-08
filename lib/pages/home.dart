@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => _logout(context),
           ),
           IconButton(
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.favorite_border),
             onPressed: () {
               Navigator.pushNamed(context, 'watchlist');
             },

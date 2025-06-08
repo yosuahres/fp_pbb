@@ -26,7 +26,7 @@ class _MoviePageState extends State<MoviePage>
   Future<void> _checkWatchlist() async {
     final args = widget.arguments;
     final movieId = int.tryParse(args['movieId'].toString()) ?? 0;
-    final exists = await firestoreService.isMovieInWatchlist(movieId);
+    final exists = await firestoreService.isMovieInWatchlistMovie(movieId);
     setState(() {
       isInWatchlist = exists;
     });
@@ -34,9 +34,9 @@ class _MoviePageState extends State<MoviePage>
 
   Future<void> _toggleWatchlist(Movie movie) async {
     if (isInWatchlist) {
-      await firestoreService.deleteWatchedMovie(movie.id.toString());
+      await firestoreService.deleteWatchlistMovieByMovieId(movie.id);
     } else {
-      await firestoreService.addWatchedMovie(
+      await firestoreService.addWatchlistMovie(
         movie.id,
         movie.title,
         movie.posterPath,
@@ -46,15 +46,6 @@ class _MoviePageState extends State<MoviePage>
     setState(() {
       isInWatchlist = !isInWatchlist;
     });
-  }
-
-  void _watchedMovie(Movie movie) async {
-    await firestoreService.addWatchedMovie(
-      movie.id,
-      movie.title,
-      movie.posterPath,
-      movie.overview,
-    );
   }
 
   @override

@@ -101,7 +101,7 @@ class FirestoreService {
     'movie',
   );
 
-  Future<void> addWatchedMovie(
+  Future<void> addWatchlistMovie(
     int movieId,
     String title,
     String posterPath,
@@ -116,25 +116,36 @@ class FirestoreService {
     });
   }
 
-  Stream<QuerySnapshot> getWatchedMovie() {
+  Stream<QuerySnapshot> getWatchlistMovie() {
     return movie.orderBy('timestamp', descending: true).snapshots();
   }
 
-  Future<void> updateWatchedMovie(String docId, String comment) {
+  Future<void> updateWatchlistMovie(String docId, String comment) {
     return movie.doc(docId).update({
       'comment': comment,
       'timestamp': Timestamp.now(),
     });
   }
 
-  Future<void> deleteWatchedMovie(String docId) {
+  Future<void> deleteWatchlistMovie(String docId) {
     return movie.doc(docId).delete();
   }
 
-  Future<bool> isMovieInWatchlist(int movieId) async {
+  Future<void> deleteWatchlistMovieByMovieId(int movieId) async {
     final snapshot =
         await FirebaseFirestore.instance
-            .collection('watchlist')
+            .collection('movie')
+            .where('movieId', isEqualTo: movieId)
+            .get();
+    for (var doc in snapshot.docs) {
+      await doc.reference.delete();
+    }
+  }
+
+  Future<bool> isMovieInWatchlistMovie(int movieId) async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('movie')
             .where('movieId', isEqualTo: movieId)
             .get();
     return snapshot.docs.isNotEmpty;
