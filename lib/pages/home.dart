@@ -94,43 +94,95 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _bottomNavBar() {
     switch (status) {
-      case 0:
-        return _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-              itemCount: _movies.length,
-              itemBuilder: (context, index) {
-                final movie = _movies[index];
-                return ListTile(
-                  leading:
-                      movie.posterPath.isNotEmpty
-                          ? Image.network(movie.posterUrl)
-                          : const SizedBox(width: 50),
-                  title: Text(movie.title),
-                  subtitle: Text(
-                    movie.overview,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+case 0:
+  return _isLoading
+      ? const Center(child: CircularProgressIndicator())
+      : SingleChildScrollView(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: Text(
+                  "Popular Movies",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
-                  // trailing: IconButton(
-                  //   icon: const Icon(Icons.favorite),
-                  //   onPressed: () => _watchedMovie(movie),
-                  // ),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      'movie',
-                      arguments: {
-                        'movieId': movie.id.toString(),
-                        'movieName': movie.title,
-                        'posterPath': movie.posterPath,
-                        'overview': movie.overview,
-                      },
-                    );
-                  },
-                );
-              },
-            );
+                ),
+              ),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _movies.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, // Netflix vibes
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 0.6,
+                ),
+                itemBuilder: (context, index) {
+                  final movie = _movies[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        'movie',
+                        arguments: {
+                          'movieId': movie.id.toString(),
+                          'movieName': movie.title,
+                          'posterPath': movie.posterPath,
+                          'overview': movie.overview,
+                        },
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Stack(
+                        children: [
+                          movie.posterPath.isNotEmpty
+                              ? Image.network(
+                                  movie.posterUrl,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                )
+                              : Container(
+                                  color: Colors.grey.shade800,
+                                  child: const Center(
+                                    child: Icon(Icons.movie, size: 40, color: Colors.white),
+                                  ),
+                                ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                              color: Colors.black.withOpacity(0.6),
+                              child: Text(
+                                movie.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+
       case 1:
         return StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
