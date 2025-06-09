@@ -73,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Container(
               height: 400,
               decoration: const BoxDecoration(
-                color: Color(0xFF4A0072),
+                color: Color(0xFF212121),
               ),
               child: Stack(
                 children: [
@@ -224,7 +224,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : register,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFE5F55),
+                    backgroundColor: Color(0xFF424242),
                     padding: const EdgeInsets.symmetric(vertical: 18.0), 
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -261,7 +261,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: Text(
                           'Sign In',
                           style: TextStyle(
-                            color: Color(0xFF6200EE),
+                            color: Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                             // decoration: TextDecoration.underline,

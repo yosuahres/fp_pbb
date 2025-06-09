@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Container(
               height: 400,
-              decoration: const BoxDecoration(color: Color(0xFF4A0072)),
+              decoration: const BoxDecoration(color: Color(0xFF212121)),
               child: Stack(
                 children: [
                   //logo app ntar
@@ -230,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : signIn,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFE5F55),
+                            backgroundColor: const Color(0xFF424242),
                             padding: const EdgeInsets.symmetric(vertical: 18.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
@@ -277,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: const Text(
                               'Sign Up',
                               style: TextStyle(
-                                color: Color(0xFF6200EE),
+                                color: Colors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
