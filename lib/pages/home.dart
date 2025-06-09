@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:finalpbb/pages/movies.dart';
+import 'package:finalpbb/pages/profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,51 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacementNamed(context, 'login');
-  }
-
-  Widget _profile() {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        final user = snapshot.data;
-        if (user != null) {
-          // Logged in
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.person, size: 80),
-                SizedBox(height: 16),
-                Text(user.email ?? 'No email', style: TextStyle(fontSize: 18)),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _logout(context),
-                  child: Text('Logout'),
-                ),
-              ],
-            ),
-          );
-        } else {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.person_off, size: 80),
-                SizedBox(height: 16),
-                Text("You're not logged in", style: TextStyle(fontSize: 18)),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, 'login');
-                  },
-                  child: Text('Login'),
-                ),
-              ],
-            ),
-          );
-        }
-      },
-    );
   }
 
   Widget _bottomNavBar() {
@@ -158,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return const Center(child: Text('Promos'));
       case 3:
-        return _profile();
+        return const ProfileScreen();
       default:
         return const Center(child: Text('Page not found'));
     }

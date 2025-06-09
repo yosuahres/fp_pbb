@@ -3,37 +3,48 @@ import 'package:flutter/material.dart';
 import 'package:finalpbb/models/movie_model.dart';
 import 'package:finalpbb/pages/popular_movies_page.dart';
 import 'package:finalpbb/services/api_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 Widget buildMoviesHome({required bool isLoading, required List<Movie> movies, required BuildContext context}) {
-  return isLoading
-      ? const Center(child: CircularProgressIndicator())
-      : SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  return StreamBuilder<User?>(
+    stream: FirebaseAuth.instance.authStateChanges(),
+    builder: (context, snapshot) {
+      final user = snapshot.data;
+
+      return isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Greeting & Notification
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const CircleAvatar(
-                          backgroundImage: NetworkImage("https://randomuser.me/api/portraits/men/12.jpg"),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text("Welcome back 👋", style: TextStyle(fontSize: 14, color: Colors.grey)),
-                            Text("Salah", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Row(
+                          children: [
+                            const CircleAvatar(
+                              backgroundImage: NetworkImage("https://randomuser.me/api/portraits/men/12.jpg"),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("Welcome back 👋", style: TextStyle(fontSize: 14, color: Colors.grey)),
+                                Text(
+                                  user?.email ?? 'Guest',
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
+                        const Icon(Icons.notifications_none, color: Colors.black),
                       ],
                     ),
-                    const Icon(Icons.notifications_none, color: Colors.black),
-                  ],
-                ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -218,4 +229,6 @@ Widget buildMoviesHome({required bool isLoading, required List<Movie> movies, re
             ),
           ),
         );
+      },
+  );
 }
