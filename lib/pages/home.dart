@@ -4,6 +4,7 @@ import 'package:finalpbb/models/movie_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalpbb/pages/popular_movies_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -151,118 +152,165 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemCount: _movies.length,
                           itemBuilder: (context, index) {
                             final movie = _movies[index];
-                            return Container(
-                              width: 160,
-                              margin: const EdgeInsets.only(right: 16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
-                                      movie.posterUrl,
-                                      height: 220,
-                                      width: 160,
-                                      fit: BoxFit.cover,
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  'movie',
+                                  arguments: {
+                                    'movieId': movie.id.toString(),
+                                    'movieName': movie.title,
+                                    'posterPath': movie.posterPath,
+                                    'overview': movie.overview,
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: 160,
+                                margin: const EdgeInsets.only(right: 16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.network(
+                                        movie.posterUrl,
+                                        height: 220,
+                                        width: 160,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    movie.title,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.star, color: Colors.amber, size: 16),
-                                      const SizedBox(width: 4),
-                                      Text("9/10 IMDb", style: const TextStyle(fontSize: 12)),
-                                    ],
-                                  ),
-                                ],
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      movie.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                                        const SizedBox(width: 4),
+                                        Text("9/10 IMDb", style: const TextStyle(fontSize: 12)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },
                         ),
                       ),
 
+
                       const SizedBox(height: 24),
 
                       // Popular Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text("Popular", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text("See more", style: TextStyle(color: Colors.blue)),
+                        children: [
+                          const Text(
+                            "Popular",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PopularMoviesPage(movies: _movies),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "See more",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
                         ],
                       ),
+
                       const SizedBox(height: 16),
 
                       Column(
                         children: _movies.take(3).map((movie) {
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    movie.posterUrl,
-                                    height: 100,
-                                    width: 80,
-                                    fit: BoxFit.cover,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                'movie',
+                                arguments: {
+                                  'movieId': movie.id.toString(),
+                                  'movieName': movie.title,
+                                  'posterPath': movie.posterPath,
+                                  'overview': movie.overview,
+                                },
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      movie.posterUrl,
+                                      height: 100,
+                                      width: 80,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        movie.title,
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.star, color: Colors.amber, size: 16),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            "9/10 IMDb",
-                                            style: const TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Wrap(
-                                        spacing: 6,
-                                        children: [
-                                          Chip(
-                                            label: const Text("Action"),
-                                            backgroundColor: Colors.grey[200],
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(24),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          movie.title,
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.star, color: Colors.amber, size: 16),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              "8/10 IMDb",
+                                              style: const TextStyle(fontSize: 12),
                                             ),
-                                          ),
-                                          Chip(
-                                            label: const Text("Fantasy"),
-                                            backgroundColor: Colors.grey[200],
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(24),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Wrap(
+                                          spacing: 6,
+                                          children: [
+                                            Chip(
+                                              label: const Text("Action"),
+                                              backgroundColor: Colors.grey[200],
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(24),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
+                                            Chip(
+                                              label: const Text("Fantasy"),
+                                              backgroundColor: Colors.grey[200],
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(24),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           );
                         }).toList(),
                       ),
+
                     ],
                   ),
                 ),
