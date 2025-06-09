@@ -1,5 +1,4 @@
 import 'package:finalpbb/db/firestore.dart';
-import 'package:finalpbb/pages/login.dart';
 import 'package:finalpbb/services/api_service.dart';
 import 'package:finalpbb/models/movie_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,6 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchMovies();
+  }
+
+  final PageController _carouselController = PageController(viewportFraction: 0.8);
+  @override
+  void dispose() {
+    _carouselController.dispose();
+    super.dispose();
   }
 
   void didChangeDependencies() {
@@ -94,94 +100,174 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _bottomNavBar() {
     switch (status) {
-case 0:
-  return _isLoading
-      ? const Center(child: CircularProgressIndicator())
-      : SingleChildScrollView(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Text(
-                  "Popular Movies",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _movies.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // Netflix vibes
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.6,
-                ),
-                itemBuilder: (context, index) {
-                  final movie = _movies[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        'movie',
-                        arguments: {
-                          'movieId': movie.id.toString(),
-                          'movieName': movie.title,
-                          'posterPath': movie.posterPath,
-                          'overview': movie.overview,
-                        },
-                      );
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Stack(
+      case 0:
+        return _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Greeting & Notification
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          movie.posterPath.isNotEmpty
-                              ? Image.network(
-                                  movie.posterUrl,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                )
-                              : Container(
-                                  color: Colors.grey.shade800,
-                                  child: const Center(
-                                    child: Icon(Icons.movie, size: 40, color: Colors.white),
-                                  ),
-                                ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                              color: Colors.black.withOpacity(0.6),
-                              child: Text(
-                                movie.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
+                          Row(
+                            children: [
+                              const CircleAvatar(
+                                backgroundImage: NetworkImage("https://randomuser.me/api/portraits/men/12.jpg"),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text("Welcome back 👋", style: TextStyle(fontSize: 14, color: Colors.grey)),
+                                  Text("Salah", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ],
                           ),
+                          const Icon(Icons.notifications_none, color: Colors.black),
                         ],
                       ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
+
+                      const SizedBox(height: 24),
+
+                      // Now Showing Section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text("Now Showing", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text("See more", style: TextStyle(color: Colors.blue)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      SizedBox(
+                        height: 280,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _movies.length,
+                          itemBuilder: (context, index) {
+                            final movie = _movies[index];
+                            return Container(
+                              width: 160,
+                              margin: const EdgeInsets.only(right: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      movie.posterUrl,
+                                      height: 220,
+                                      width: 160,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    movie.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text("9/10 IMDb", style: const TextStyle(fontSize: 12)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Popular Section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text("Popular", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text("See more", style: TextStyle(color: Colors.blue)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      Column(
+                        children: _movies.take(3).map((movie) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    movie.posterUrl,
+                                    height: 100,
+                                    width: 80,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        movie.title,
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.star, color: Colors.amber, size: 16),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            "9/10 IMDb",
+                                            style: const TextStyle(fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Wrap(
+                                        spacing: 6,
+                                        children: [
+                                          Chip(
+                                            label: const Text("Action"),
+                                            backgroundColor: Colors.grey[200],
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(24),
+                                            ),
+                                          ),
+                                          Chip(
+                                            label: const Text("Fantasy"),
+                                            backgroundColor: Colors.grey[200],
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(24),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+
 
       case 1:
         return StreamBuilder<User?>(
@@ -291,45 +377,28 @@ case 0:
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
-      // _isLoading
-      //     ? const Center(child: CircularProgressIndicator())
-      //     : ListView.builder(
-      //       itemCount: _movies.length,
-      //       itemBuilder: (context, index) {
-      //         final movie = _movies[index];
-      //         return ListTile(
-      //           leading:
-      //               movie.posterPath.isNotEmpty
-      //                   ? Image.network(movie.posterUrl)
-      //                   : const SizedBox(width: 50),
-      //           title: Text(movie.title),
-      //           subtitle: Text(
-      //             movie.overview,
-      //             maxLines: 2,
-      //             overflow: TextOverflow.ellipsis,
-      //           ),
-      //           trailing: IconButton(
-      //             icon: const Icon(Icons.heart_broken),
-      //             onPressed: () => _watchedMovie(movie),
-      //           ),
-      //           onTap:  () {
-      //             Navigator.pushNamed(context, 'ticketseat',
-      //             arguments: {
-      //               'movieId': movie.id.toString(),
-      //               'movieName': movie.title,
-      //               'posterPath': movie.posterPath,
-      //               // 'overview': movie.overview,
-      //             }
-      //             );
-      //           },
-      //         );
-      //       },
-      //     ),
     );
-    // } else {
-    //   return const LoginScreen();
-    // }
-    // },
-    // );
   }
 }
+
+class FilterIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const FilterIcon({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 24,
+          backgroundColor: Colors.grey[200],
+          child: Icon(icon, color: Colors.black),
+        ),
+        const SizedBox(height: 6),
+        Text(label, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+}
+
