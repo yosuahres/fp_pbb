@@ -194,24 +194,32 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: _bottomNavBar(),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        currentIndex: status,
-        onTap: _tempStatus,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Movies'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: 'My Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_offer),
-            label: 'Promos',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.purple.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: Offset(0, -2), // bayangan ke atas
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent, // transparan, biar BoxDecoration di atas keliatan
+          elevation: 0, // hapus shadow bawaan
+          selectedItemColor: Colors.purple, // warna icon saat aktif
+          unselectedItemColor: Colors.black, // warna icon saat nonaktif
+          currentIndex: status,
+          onTap: _tempStatus,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Movies'),
+            BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Orders'),
+            BottomNavigationBarItem(icon: Icon(Icons.local_offer), label: 'Promos'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          ],
+        ),
       ),
     );
   }
