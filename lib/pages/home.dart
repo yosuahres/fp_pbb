@@ -281,26 +281,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 6),
-                                        Wrap(
-                                          spacing: 6,
-                                          children: [
-                                            Chip(
-                                              label: const Text("Action"),
-                                              backgroundColor: Colors.grey[200],
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(24),
-                                              ),
-                                            ),
-                                            Chip(
-                                              label: const Text("Fantasy"),
-                                              backgroundColor: Colors.grey[200],
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(24),
-                                              ),
-                                            ),
-                                          ],
+                                        const SizedBox(height: 8),
+                                        FutureBuilder<List<String>>(
+                                          future: ApiService.fetchKeywords(movie.id),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return const SizedBox(); // Atau loader kecil
+                                            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                                              return const Text("No tags");
+                                            } else {
+                                              final keywords = snapshot.data!;
+                                              return Wrap(
+                                                spacing: 6,
+                                                children: keywords.take(3).map((keyword) {
+                                                  return Chip(
+                                                    label: Text(keyword),
+                                                    backgroundColor: Colors.grey[200],
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(24),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              );
+                                            }
+                                          },
                                         ),
+
                                       ],
                                     ),
                                   )
@@ -310,7 +316,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }).toList(),
                       ),
-
                     ],
                   ),
                 ),
