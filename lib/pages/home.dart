@@ -249,6 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             child: Container(
                               margin: const EdgeInsets.only(bottom: 16),
+                              child: IntrinsicHeight(
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -256,8 +257,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                     child: Image.network(
                                       movie.posterUrl,
-                                      height: 100,
-                                      width: 80,
+                                      height: 120,
+                                      width: 100,
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -282,36 +283,51 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ],
                                         ),
                                         const SizedBox(height: 8),
+
                                         FutureBuilder<List<String>>(
                                           future: ApiService.fetchKeywords(movie.id),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState == ConnectionState.waiting) {
-                                              return const SizedBox(); // Atau loader kecil
+                                              return const SizedBox(); // Loader kecil kalau mau fancy
                                             } else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
                                               return const Text("No tags");
                                             } else {
                                               final keywords = snapshot.data!;
-                                              return Wrap(
-                                                spacing: 6,
-                                                children: keywords.take(3).map((keyword) {
-                                                  return Chip(
-                                                    label: Text(keyword),
-                                                    backgroundColor: Colors.grey[200],
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(24),
-                                                    ),
-                                                  );
-                                                }).toList(),
+                                              return Container(
+                                                constraints: const BoxConstraints(
+                                                  maxHeight: 65, // 2 baris kira-kira
+                                                ),
+                                                child: SingleChildScrollView(
+                                                  child: Wrap(
+                                                    spacing: 6,
+                                                    runSpacing: 4,
+                                                    children: keywords.map((keyword) {
+                                                      return Chip(
+                                                        label: Text(
+                                                          keyword,
+                                                          style: const TextStyle(fontSize: 8),
+                                                        ),
+                                                        backgroundColor: Colors.grey[200],
+                                                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 0),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(24),
+                                                        ),
+                                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                        visualDensity: VisualDensity.compact,
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                                ),
                                               );
                                             }
                                           },
                                         ),
-
                                       ],
                                     ),
                                   )
                                 ],
                               ),
+                            ),
                             ),
                           );
                         }).toList(),
