@@ -45,7 +45,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Order successfully cancelled!')),
       );
-      Navigator.popUntil(context, ModalRoute.withName('home')); // Go back to home, specifically orders tab
+      Navigator.popUntil(context, ModalRoute.withName('home')); 
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,7 +60,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final List<dynamic> selectedSeats = widget.orderData['selectedSeats'] as List<dynamic>? ?? [];
     final String totalPrice = widget.orderData['totalPrice']?.toString() ?? 'N/A';
     final String posterPath = widget.orderData['posterPath'] ?? '';
-    final String movieId = widget.orderData['movieId'] ?? ''; // Assuming movieId is in orderData
+    final String movieId = widget.orderData['movieId'] ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -99,30 +99,36 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: FilledButton.icon(
                 onPressed: () {
-                  // Navigate to TicketSeatScreen for editing
                   Navigator.pushNamed(
                     context,
-                    'ticketseat', // Assuming 'ticketseat' is the route name for TicketSeatScreen
+                    'ticketseat', 
                     arguments: {
                       'movieId': movieId,
                       'movieName': movieName,
                       'posterPath': posterPath,
                       'selectedSeats': selectedSeats,
                       'totalPrice': totalPrice,
-                      'orderId': widget.orderId, // Pass the orderId
-                      'isEditing': true, // Indicate that we are in edit mode
+                      'orderId': widget.orderId, 
+                      'isEditing': true, 
                     },
                   );
                 },
-                child: const Text('Edit Seats'),
+                icon: const Icon(Icons.edit),
+                label: const Text('Edit Seats'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 10), // Spacing between buttons
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: OutlinedButton.icon(
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -133,14 +139,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // Dismiss dialog
+                              Navigator.of(context).pop();
                             },
                             child: const Text('No'),
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(); // Dismiss dialog
-                              _cancelOrder(); // Execute cancellation
+                              Navigator.of(context).pop(); 
+                              _cancelOrder(); 
                             },
                             child: const Text('Yes'),
                           ),
@@ -149,11 +155,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     },
                   );
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('Cancel Order', style: TextStyle(color: Colors.white)),
+                icon: const Icon(Icons.cancel),
+                label: const Text('Cancel Order'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.red),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
             ),
-            // Add more details if needed
           ],
         ),
       ),
