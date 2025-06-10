@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(
                           builder: (context) => OrderDetailScreen(
                             orderData: data,
-                            orderId: docs[index].id, // Pass the document ID as orderId
+                            orderId: docs[index].id, 
                           ),
                         ),
                       ),
