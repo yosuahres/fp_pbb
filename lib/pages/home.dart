@@ -1,10 +1,12 @@
 import 'package:finalpbb/db/firestore.dart';
-import 'package:finalpbb/pages/login.dart';
 import 'package:finalpbb/services/api_service.dart';
 import 'package:finalpbb/models/movie_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:finalpbb/pages/movies.dart';
+import 'package:finalpbb/pages/profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchMovies();
+  }
+
+  final PageController _carouselController = PageController(viewportFraction: 0.8);
+  @override
+  void dispose() {
+    _carouselController.dispose();
+    super.dispose();
   }
 
   void didChangeDependencies() {
@@ -47,141 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushReplacementNamed(context, 'login');
   }
 
-  Widget _profile() {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        final user = snapshot.data;
-        if (user != null) {
-          // Logged in
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.person, size: 80),
-                SizedBox(height: 16),
-                Text(user.email ?? 'No email', style: TextStyle(fontSize: 18)),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _logout(context),
-                  child: Text('Logout'),
-                ),
-              ],
-            ),
-          );
-        } else {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.person_off, size: 80),
-                SizedBox(height: 16),
-                Text("You're not logged in", style: TextStyle(fontSize: 18)),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, 'login');
-                  },
-                  child: Text('Login'),
-                ),
-              ],
-            ),
-          );
-        }
-      },
-    );
-  }
-
   Widget _bottomNavBar() {
     switch (status) {
-case 0:
-  return _isLoading
-      ? const Center(child: CircularProgressIndicator())
-      : SingleChildScrollView(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Text(
-                  "Popular Movies",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _movies.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // Netflix vibes
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.6,
-                ),
-                itemBuilder: (context, index) {
-                  final movie = _movies[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        'movie',
-                        arguments: {
-                          'movieId': movie.id.toString(),
-                          'movieName': movie.title,
-                          'posterPath': movie.posterPath,
-                          'overview': movie.overview,
-                        },
-                      );
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Stack(
-                        children: [
-                          movie.posterPath.isNotEmpty
-                              ? Image.network(
-                                  movie.posterUrl,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                )
-                              : Container(
-                                  color: Colors.grey.shade800,
-                                  child: const Center(
-                                    child: Icon(Icons.movie, size: 40, color: Colors.white),
-                                  ),
-                                ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                              color: Colors.black.withOpacity(0.6),
-                              child: Text(
-                                movie.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
+      case 0:
+        return buildMoviesHome(isLoading: _isLoading, movies: _movies, context: context);
 
       case 1:
         return StreamBuilder<User?>(
@@ -236,7 +114,7 @@ case 0:
       case 2:
         return const Center(child: Text('Promos'));
       case 3:
-        return _profile();
+        return const ProfileScreen();
       default:
         return const Center(child: Text('Page not found'));
     }
@@ -272,64 +150,34 @@ case 0:
         ],
       ),
       body: _bottomNavBar(),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        currentIndex: status,
-        onTap: _tempStatus,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Movies'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: 'My Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_offer),
-            label: 'Promos',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.purple.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: Offset(0, -2), // bayangan ke atas
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent, // transparan, biar BoxDecoration di atas keliatan
+          elevation: 0, // hapus shadow bawaan
+          selectedItemColor: Colors.purple, // warna icon saat aktif
+          unselectedItemColor: Colors.black, // warna icon saat nonaktif
+          currentIndex: status,
+          onTap: _tempStatus,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Movies'),
+            BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Orders'),
+            BottomNavigationBarItem(icon: Icon(Icons.local_offer), label: 'Promos'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          ],
+        ),
       ),
-      // _isLoading
-      //     ? const Center(child: CircularProgressIndicator())
-      //     : ListView.builder(
-      //       itemCount: _movies.length,
-      //       itemBuilder: (context, index) {
-      //         final movie = _movies[index];
-      //         return ListTile(
-      //           leading:
-      //               movie.posterPath.isNotEmpty
-      //                   ? Image.network(movie.posterUrl)
-      //                   : const SizedBox(width: 50),
-      //           title: Text(movie.title),
-      //           subtitle: Text(
-      //             movie.overview,
-      //             maxLines: 2,
-      //             overflow: TextOverflow.ellipsis,
-      //           ),
-      //           trailing: IconButton(
-      //             icon: const Icon(Icons.heart_broken),
-      //             onPressed: () => _watchedMovie(movie),
-      //           ),
-      //           onTap:  () {
-      //             Navigator.pushNamed(context, 'ticketseat',
-      //             arguments: {
-      //               'movieId': movie.id.toString(),
-      //               'movieName': movie.title,
-      //               'posterPath': movie.posterPath,
-      //               // 'overview': movie.overview,
-      //             }
-      //             );
-      //           },
-      //         );
-      //       },
-      //     ),
     );
-    // } else {
-    //   return const LoginScreen();
-    // }
-    // },
-    // );
   }
 }
+

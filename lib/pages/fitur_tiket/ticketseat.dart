@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalpbb/db/firestore.dart'; 
 import 'package:finalpbb/models/seat_model.dart';
 import 'dart:math' as math;
@@ -98,49 +96,12 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
     }
   }
 
-  Future<void> _bookSelectedSeats() async {
-    if (_selectedSeatDocIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pilih salah satu kursi terlebih dahulu.')),
-      );
-      return;
-    }
-
-    setState(() { _isLoading = true; }); 
-
-    try {
-      WriteBatch batch = FirebaseFirestore.instance.batch();
-      for (String seatDocId in _selectedSeatDocIds) {
-        Seat s = _allSeats.firstWhere((seat) => seat.docId == seatDocId);
-
-        DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
-        batch.update(seatRef, {
-          'status': 'booked',
-          'userId': FirebaseAuth.instance.currentUser?.uid,
-          'timestamp': Timestamp.now(),
-        });
-      }
-      await batch.commit();
-
-      setState(() {
-        _selectedSeatDocIds.clear(); 
-        _isLoading = false;
-      });
-
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('bad: $e')),
-      );
-      setState(() { _isLoading = false; });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     List<Seat> currentlySelectedSeats = _allSeats
         .where((seat) => _selectedSeatDocIds.contains(seat.docId))
         .toList();
-    String selectedSeatNames = currentlySelectedSeats.map((s) => s.seatId).join(', ');
     double totalPrice = currentlySelectedSeats.length * _seatPrice;
 
 
