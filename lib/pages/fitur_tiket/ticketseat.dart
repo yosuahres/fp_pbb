@@ -13,15 +13,19 @@ class TicketSeatScreen extends StatefulWidget {
 
 class _TicketSeatScreenState extends State<TicketSeatScreen> {
   final FirestoreService _firestoreService = FirestoreService();
-  //get data;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   late String movieId;
   late String movieName;
   late String posterPath;
+  late String? orderId; // New: Optional orderId for editing
+  late List<String> initialSelectedSeats; // New: For pre-selecting seats in edit mode
+  late bool isEditing; // New: Flag to indicate edit mode
 
   List<Seat> _allSeats = [];
-  final List<String> _selectedSeatDocIds = []; 
+  final List<String> _selectedSeatDocIds = [];
   final double _seatPrice = 50000.0;
-  
+
   bool _isLoading = true;
 
   final int _numRows = 5;
@@ -30,9 +34,9 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   @override
   void initState() {
     super.initState();
-    // _LoadSeats();
   }
-  
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)!.settings.arguments as Map?;
@@ -40,6 +44,14 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
       movieId = args['movieId'].toString() ?? '';
       movieName = args['movieName'] ?? '';
       posterPath = args['posterPath'] ?? '';
+      orderId = args['orderId'] as String?; // Get orderId
+      initialSelectedSeats = List<String>.from(args['selectedSeats'] ?? []); // Get initial selected seats
+      isEditing = args['isEditing'] ?? false; // Get isEditing flag
+
+      if (isEditing && initialSelectedSeats.isNotEmpty) {
+        // Pre-select seats if in edit mode
+        _selectedSeatDocIds.addAll(initialSelectedSeats);
+      }
     }
     _LoadSeats();
   }
@@ -73,7 +85,10 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   }
 
   void _onSeatTap(Seat seat) {
-    if (seat.status == 'booked') {
+    final currentUserUid = _auth.currentUser?.uid;
+
+    // If the seat is booked by someone else, it's not selectable
+    if (seat.status == 'booked' && seat.userId != currentUserUid) {
       return;
     }
 
@@ -87,12 +102,14 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   }
 
   Color _getSeatColor(Seat seat) {
-    if (seat.status == 'booked') {
-      return Colors.grey.shade400; 
+    final currentUserUid = _auth.currentUser?.uid;
+
+    if (seat.status == 'booked' && seat.userId != currentUserUid) {
+      return Colors.grey.shade400; // Booked by another user
     } else if (_selectedSeatDocIds.contains(seat.docId)) {
-      return Colors.blue.shade400; 
+      return Colors.blue.shade400; // Selected by current user
     } else {
-      return Colors.blueGrey.shade900;
+      return Colors.blueGrey.shade900; // Available
     }
   }
 
@@ -394,6 +411,8 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                                               'seatDocIds': _selectedSeatDocIds,
                                               'totalPrice': totalPrice,
                                               'posterPath': posterPath,
+                                              'orderId': orderId, // Pass orderId
+                                              'isEditing': isEditing, // Pass isEditing flag
                                             },
                                           );
                                         });
