@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:finalpbb/pages/movies.dart';
 import 'package:finalpbb/pages/profile.dart';
+import 'package:finalpbb/pages/orders_detail.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -79,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
               builder: (context, snapshot) {
+
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -86,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (docs.isEmpty) {
                   return const Center(child: Text('Belum ada pesanan.'));
                 }
+                
                 return ListView.builder(
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
@@ -103,6 +106,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Kursi: ${(data['selectedSeats'] as List).join(', ')}\nTotal: Rp${data['totalPrice']}',
                       ),
                       isThreeLine: true,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderDetailScreen(
+                            orderData: data,
+                            orderId: docs[index].id, // Pass the document ID as orderId
+                          ),
+                        ),
+                      ),
                     );
                   },
                 );
@@ -180,4 +192,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

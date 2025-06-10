@@ -4,13 +4,13 @@ import 'package:finalpbb/db/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class TicketSummaryScreen extends StatefulWidget {
-  const TicketSummaryScreen({ Key? key }) : super(key: key);
+  const TicketSummaryScreen({Key? key}) : super(key: key);
 
   @override
-  _TicketseatState createState() => _TicketseatState();
+  _TicketSummaryScreenState createState() => _TicketSummaryScreenState();
 }
 
-class _TicketseatState extends State<TicketSummaryScreen> {
+class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -21,15 +21,8 @@ class _TicketseatState extends State<TicketSummaryScreen> {
   late List<String> selectedSeats;
   late List<String> seatDocIds;
   late double totalPrice;
-
-  _TicketseatState() {
-    movieId = '';
-    movieName = '';
-    posterPath = '';
-    selectedSeats = [];
-    seatDocIds = [];
-    totalPrice = 0.0;
-  }
+  late String? orderId; // New: Optional orderId for editing
+  late bool isEditing; // New: Flag to indicate edit mode
 
   @override
   void didChangeDependencies() {
@@ -40,24 +33,26 @@ class _TicketseatState extends State<TicketSummaryScreen> {
       movieName = args['movieName'] ?? '';
       selectedSeats = List<String>.from(args['selectedSeats'] ?? []);
       seatDocIds = List<String>.from(args['seatDocIds'] ?? []);
-      totalPrice = args['totalPrice']?.toDouble() ?? 0.0; 
+      totalPrice = args['totalPrice']?.toDouble() ?? 0.0;
       posterPath = args['posterPath'] ?? '';
+      orderId = args['orderId'] as String?; // Get orderId
+      isEditing = args['isEditing'] ?? false; // Get isEditing flag
 
       if (movieId.isEmpty || selectedSeats.isEmpty || totalPrice <= 0) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Error: Informasi tiket tidak lengkap.')),
-            );
-            Navigator.of(context).pop(); 
-          });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error: Informasi tiket tidak lengkap.')),
+          );
+          Navigator.of(context).pop();
+        });
       }
     } else {
-       WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error: Gagal memuat detail tiket.')),
-          );
-          Navigator.of(context).pop(); 
-       });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error: Gagal memuat detail tiket.')),
+        );
+        Navigator.of(context).pop();
+      });
     }
   }
 
@@ -70,21 +65,78 @@ class _TicketseatState extends State<TicketSummaryScreen> {
     if (!mounted) return;
     try {
       WriteBatch batch = FirebaseFirestore.instance.batch();
-      for (String seatDocId in seatDocIds) {
-        DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
-        batch.update(seatRef, {
-          'status': 'booked',
-          'userId': _auth.currentUser?.uid,
+      final currentUserUid = _auth.currentUser?.uid;
+
+      if (isEditing && orderId != null) {
+        // --- EDITING EXISTING ORDER ---
+        // 1. Get old selected seats from the order
+        DocumentSnapshot orderDoc = await FirebaseFirestore.instance.collection('orders').doc(orderId).get();
+        List<String> oldSelectedSeats = List<String>.from(orderDoc['selectedSeats'] ?? []);
+
+        // 2. Unbook old seats
+        for (String oldSeatId in oldSelectedSeats) {
+          // Find the docId for the oldSeatId
+          QuerySnapshot seatQuery = await _firestoreService.getSeatsCollection(movieId)
+              .where('seatId', isEqualTo: oldSeatId)
+              .limit(1)
+              .get();
+          if (seatQuery.docs.isNotEmpty) {
+            DocumentReference oldSeatRef = seatQuery.docs.first.reference;
+            batch.update(oldSeatRef, {
+              'status': 'available',
+              'userId': FieldValue.delete(), // Remove userId
+              'timestamp': FieldValue.delete(), // Remove timestamp
+            });
+          }
+        }
+
+        // 3. Book new seats
+        for (String newSeatDocId in seatDocIds) {
+          DocumentReference newSeatRef = _firestoreService.getSeatsCollection(movieId).doc(newSeatDocId);
+          batch.update(newSeatRef, {
+            'status': 'booked',
+            'userId': currentUserUid,
+            'timestamp': Timestamp.now(),
+          });
+        }
+
+        // 4. Update the existing order document
+        await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
+          'selectedSeats': selectedSeats,
+          'seatDocIds': seatDocIds, // Assuming you want to store docIds in order too
+          'totalPrice': totalPrice,
+          'timestamp': Timestamp.now(), // Update timestamp for the order
+        });
+
+      } else {
+        // --- CREATING NEW ORDER ---
+        for (String seatDocId in seatDocIds) {
+          DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
+          batch.update(seatRef, {
+            'status': 'booked',
+            'userId': currentUserUid,
+            'timestamp': Timestamp.now(),
+          });
+        }
+        await batch.commit();
+
+        // Add order to 'orders' collection
+        await FirebaseFirestore.instance.collection('orders').add({
+          'userId': currentUserUid,
+          'movieId': movieId,
+          'movieName': movieName,
+          'selectedSeats': selectedSeats,
+          'seatDocIds': seatDocIds, // Store seatDocIds for easier unbooking later
+          'totalPrice': totalPrice,
+          'posterPath': posterPath,
           'timestamp': Timestamp.now(),
         });
       }
-      await batch.commit();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Tiket berhasil dikonfirmasi!')),
       );
       Navigator.popUntil(context, ModalRoute.withName('home'));
-
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
