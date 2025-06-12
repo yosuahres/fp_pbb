@@ -18,9 +18,9 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   late String movieId;
   late String movieName;
   late String posterPath;
-  late String? orderId; // New: Optional orderId for editing
-  late List<String> initialSelectedSeats; // New: For pre-selecting seats in edit mode
-  late bool isEditing; // New: Flag to indicate edit mode
+  late String? orderId; 
+  late List<String> initialSelectedSeats; 
+  late bool isEditing; 
 
   List<Seat> _allSeats = [];
   final List<String> _selectedSeatDocIds = [];
@@ -44,12 +44,11 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
       movieId = args['movieId'].toString() ?? '';
       movieName = args['movieName'] ?? '';
       posterPath = args['posterPath'] ?? '';
-      orderId = args['orderId'] as String?; // Get orderId
-      initialSelectedSeats = List<String>.from(args['selectedSeats'] ?? []); // Get initial selected seats
-      isEditing = args['isEditing'] ?? false; // Get isEditing flag
+      orderId = args['orderId'] as String?; 
+      initialSelectedSeats = List<String>.from(args['selectedSeats'] ?? []); 
+      isEditing = args['isEditing'] ?? false; 
 
       if (isEditing && initialSelectedSeats.isNotEmpty) {
-        // Pre-select seats if in edit mode
         _selectedSeatDocIds.addAll(initialSelectedSeats);
       }
     }
@@ -87,7 +86,6 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
   void _onSeatTap(Seat seat) {
     final currentUserUid = _auth.currentUser?.uid;
 
-    // If the seat is booked by someone else, it's not selectable
     if (seat.status == 'booked' && seat.userId != currentUserUid) {
       return;
     }
@@ -105,11 +103,11 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
     final currentUserUid = _auth.currentUser?.uid;
 
     if (seat.status == 'booked' && seat.userId != currentUserUid) {
-      return Colors.grey.shade400; // Booked by another user
+      return Colors.grey.shade400; 
     } else if (_selectedSeatDocIds.contains(seat.docId)) {
-      return Colors.blue.shade400; // Selected by current user
+      return Colors.blue.shade400; 
     } else {
-      return Colors.blueGrey.shade900; // Available
+      return Colors.blueGrey.shade900; 
     }
   }
 
@@ -150,7 +148,6 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
             fontSize: 18, 
           ),
         ),
-        // backgroundColor: Colors.grey.shade50,
       ),
       body: Container(
       decoration: BoxDecoration(
@@ -269,7 +266,6 @@ class _TicketSeatScreenState extends State<TicketSeatScreen> {
                                 },
                               ),
                             ),
-                            // Movie screen representation
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 60),
                               child: SizedBox(
