@@ -2,6 +2,16 @@ flutter_native_splash:
   android: true
   ios: false
   web: false
-  
-  color: "#ffffff"
-  
+
+  # Required for pre-Android 12
+  color: "#000000"
+
+  # Optional: for pre-Android 12 splash image
+  # background_image: assets/background_android<12.png
+  image: assets/logos-fineshi.png
+
+  android_12:
+    color: "#000000"
+
+    # only logos
+    image: assets/logos-fineshi.png

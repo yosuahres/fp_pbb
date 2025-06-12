@@ -6,11 +6,15 @@
 | Ahmad Fadhilah Mappisara | 5025221195 | PPB (C) |
 | Muhammad Alfan Mahdi | 5025221275 | PPB (C) |
 
+// dump  
+to run  
+dart run flutter_native_splash:create --path=native_splash.yaml  
 
 # Description App
 Aplikasi mobile untuk pembelian tiket film. Pengguna dapat menjelajahi detail film lengkap dengan sinopsis,  jadwal, dan trailer. Fitur beli tiket memudahkan pemesanan kursi. Terdapat juga review pengguna serta   watchlist untuk menyimpan film favorit dan mengatur rencana menonton.
 
 # Use Case Diagram
+
 
 ![Alt text](images/Kelompok10_UseCaseDiagram.drawio-2.png)
 
