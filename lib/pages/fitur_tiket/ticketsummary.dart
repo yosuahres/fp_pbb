@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalpbb/db/firestore.dart'; 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:finalpbb/services/paymentApi_service.dart'; 
 
 class TicketSummaryScreen extends StatefulWidget {
   const TicketSummaryScreen({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class TicketSummaryScreen extends StatefulWidget {
 class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final PaymentApiService _paymentApiService = PaymentApiService(); 
 
   late String movieId;
   late String movieName;
@@ -21,8 +23,8 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
   late List<String> selectedSeats;
   late List<String> seatDocIds;
   late double totalPrice;
-  late String? orderId; // New: Optional orderId for editing
-  late bool isEditing; // New: Flag to indicate edit mode
+  late String? orderId; 
+  late bool isEditing; 
 
   @override
   void didChangeDependencies() {
@@ -35,8 +37,8 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
       seatDocIds = List<String>.from(args['seatDocIds'] ?? []);
       totalPrice = args['totalPrice']?.toDouble() ?? 0.0;
       posterPath = args['posterPath'] ?? '';
-      orderId = args['orderId'] as String?; // Get orderId
-      isEditing = args['isEditing'] ?? false; // Get isEditing flag
+      orderId = args['orderId'] as String?; 
+      isEditing = args['isEditing'] ?? false; 
 
       if (movieId.isEmpty || selectedSeats.isEmpty || totalPrice <= 0) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -68,14 +70,10 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
       final currentUserUid = _auth.currentUser?.uid;
 
       if (isEditing && orderId != null) {
-        // --- EDITING EXISTING ORDER ---
-        // 1. Get old selected seats from the order
         DocumentSnapshot orderDoc = await FirebaseFirestore.instance.collection('orders').doc(orderId).get();
         List<String> oldSelectedSeats = List<String>.from(orderDoc['selectedSeats'] ?? []);
 
-        // 2. Unbook old seats
         for (String oldSeatId in oldSelectedSeats) {
-          // Find the docId for the oldSeatId
           QuerySnapshot seatQuery = await _firestoreService.getSeatsCollection(movieId)
               .where('seatId', isEqualTo: oldSeatId)
               .limit(1)
@@ -84,13 +82,12 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
             DocumentReference oldSeatRef = seatQuery.docs.first.reference;
             batch.update(oldSeatRef, {
               'status': 'available',
-              'userId': FieldValue.delete(), // Remove userId
-              'timestamp': FieldValue.delete(), // Remove timestamp
+              'userId': FieldValue.delete(), 
+              'timestamp': FieldValue.delete(),
             });
           }
         }
 
-        // 3. Book new seats
         for (String newSeatDocId in seatDocIds) {
           DocumentReference newSeatRef = _firestoreService.getSeatsCollection(movieId).doc(newSeatDocId);
           batch.update(newSeatRef, {
@@ -100,16 +97,14 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
           });
         }
 
-        // 4. Update the existing order document
         await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
           'selectedSeats': selectedSeats,
-          'seatDocIds': seatDocIds, // Assuming you want to store docIds in order too
+          'seatDocIds': seatDocIds, 
           'totalPrice': totalPrice,
-          'timestamp': Timestamp.now(), // Update timestamp for the order
+          'timestamp': Timestamp.now(), 
         });
 
       } else {
-        // --- CREATING NEW ORDER ---
         for (String seatDocId in seatDocIds) {
           DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
           batch.update(seatRef, {
@@ -120,13 +115,12 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
         }
         await batch.commit();
 
-        // Add order to 'orders' collection
         await FirebaseFirestore.instance.collection('orders').add({
           'userId': currentUserUid,
           'movieId': movieId,
           'movieName': movieName,
           'selectedSeats': selectedSeats,
-          'seatDocIds': seatDocIds, // Store seatDocIds for easier unbooking later
+          'seatDocIds': seatDocIds, 
           'totalPrice': totalPrice,
           'posterPath': posterPath,
           'timestamp': Timestamp.now(),
@@ -136,6 +130,9 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Tiket berhasil dikonfirmasi!')),
       );
+      
+      await _paymentApiService.launchMidtransPayment();
+
       Navigator.popUntil(context, ModalRoute.withName('home'));
     } catch (e) {
       if (!mounted) return;
@@ -199,7 +196,6 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    // movieName can be long, ensure it's handled
                     "Movie: ${movieName.isNotEmpty ? movieName : 'Unknown Movie'}",
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     maxLines: 4,
@@ -269,7 +265,7 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
                   ),
                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
                 ),
-                child: const Text("Konfirmasi Pesanan"),
+                child: const Text("Bayar"),
               ),
             ),
             const Spacer(), 
