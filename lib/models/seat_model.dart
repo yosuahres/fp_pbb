@@ -1,11 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Seat {
-  final String docId; 
+  final String docId;
   final String seatId;
-  String status; 
-  final String? userId; 
-  final Timestamp? timestamp; 
+  String status;
+  final String? userId;
+  final Timestamp? timestamp;
 
   Seat({
     required this.docId,
@@ -22,7 +22,7 @@ class Seat {
       seatId: data['seatId'] ?? 'N/A',
       status: data['status'] ?? 'unavailable',
       userId: data['userId'],
-      timestamp: data['timestamp'] as Timestamp?, 
+      timestamp: data['timestamp'] as Timestamp?,
     );
   }
 
@@ -31,7 +31,7 @@ class Seat {
       'seatId': seatId,
       'status': status,
       'userId': userId,
-      'timestamp': timestamp ?? FieldValue.serverTimestamp(), 
+      'timestamp': timestamp ?? FieldValue.serverTimestamp(),
     };
   }
 }

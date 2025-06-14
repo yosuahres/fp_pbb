@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:finalpbb/db/firestore.dart'; 
+import 'package:finalpbb/db/firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:finalpbb/services/paymentApi_service.dart'; 
+import 'package:finalpbb/services/paymentApi_service.dart';
 
 class TicketSummaryScreen extends StatefulWidget {
   const TicketSummaryScreen({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class TicketSummaryScreen extends StatefulWidget {
 class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
   final FirestoreService _firestoreService = FirestoreService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final PaymentApiService _paymentApiService = PaymentApiService(); 
+  final PaymentApiService _paymentApiService = PaymentApiService();
 
   late String movieId;
   late String movieName;
@@ -23,8 +23,8 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
   late List<String> selectedSeats;
   late List<String> seatDocIds;
   late double totalPrice;
-  late String? orderId; 
-  late bool isEditing; 
+  late String? orderId;
+  late bool isEditing;
 
   @override
   void didChangeDependencies() {
@@ -37,13 +37,15 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
       seatDocIds = List<String>.from(args['seatDocIds'] ?? []);
       totalPrice = args['totalPrice']?.toDouble() ?? 0.0;
       posterPath = args['posterPath'] ?? '';
-      orderId = args['orderId'] as String?; 
-      isEditing = args['isEditing'] ?? false; 
+      orderId = args['orderId'] as String?;
+      isEditing = args['isEditing'] ?? false;
 
       if (movieId.isEmpty || selectedSeats.isEmpty || totalPrice <= 0) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error: Informasi tiket tidak lengkap.')),
+            const SnackBar(
+              content: Text('Error: Informasi tiket tidak lengkap.'),
+            ),
           );
           Navigator.of(context).pop();
         });
@@ -70,26 +72,36 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
       final currentUserUid = _auth.currentUser?.uid;
 
       if (isEditing && orderId != null) {
-        DocumentSnapshot orderDoc = await FirebaseFirestore.instance.collection('orders').doc(orderId).get();
-        List<String> oldSelectedSeats = List<String>.from(orderDoc['selectedSeats'] ?? []);
+        DocumentSnapshot orderDoc =
+            await FirebaseFirestore.instance
+                .collection('orders')
+                .doc(orderId)
+                .get();
+        List<String> oldSelectedSeats = List<String>.from(
+          orderDoc['selectedSeats'] ?? [],
+        );
 
         for (String oldSeatId in oldSelectedSeats) {
-          QuerySnapshot seatQuery = await _firestoreService.getSeatsCollection(movieId)
-              .where('seatId', isEqualTo: oldSeatId)
-              .limit(1)
-              .get();
+          QuerySnapshot seatQuery =
+              await _firestoreService
+                  .getSeatsCollection(movieId)
+                  .where('seatId', isEqualTo: oldSeatId)
+                  .limit(1)
+                  .get();
           if (seatQuery.docs.isNotEmpty) {
             DocumentReference oldSeatRef = seatQuery.docs.first.reference;
             batch.update(oldSeatRef, {
               'status': 'available',
-              'userId': FieldValue.delete(), 
+              'userId': FieldValue.delete(),
               'timestamp': FieldValue.delete(),
             });
           }
         }
 
         for (String newSeatDocId in seatDocIds) {
-          DocumentReference newSeatRef = _firestoreService.getSeatsCollection(movieId).doc(newSeatDocId);
+          DocumentReference newSeatRef = _firestoreService
+              .getSeatsCollection(movieId)
+              .doc(newSeatDocId);
           batch.update(newSeatRef, {
             'status': 'booked',
             'userId': currentUserUid,
@@ -97,16 +109,20 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
           });
         }
 
-        await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-          'selectedSeats': selectedSeats,
-          'seatDocIds': seatDocIds, 
-          'totalPrice': totalPrice,
-          'timestamp': Timestamp.now(), 
-        });
-
+        await FirebaseFirestore.instance
+            .collection('orders')
+            .doc(orderId)
+            .update({
+              'selectedSeats': selectedSeats,
+              'seatDocIds': seatDocIds,
+              'totalPrice': totalPrice,
+              'timestamp': Timestamp.now(),
+            });
       } else {
         for (String seatDocId in seatDocIds) {
-          DocumentReference seatRef = _firestoreService.getSeatsCollection(movieId).doc(seatDocId);
+          DocumentReference seatRef = _firestoreService
+              .getSeatsCollection(movieId)
+              .doc(seatDocId);
           batch.update(seatRef, {
             'status': 'booked',
             'userId': currentUserUid,
@@ -120,7 +136,7 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
           'movieId': movieId,
           'movieName': movieName,
           'selectedSeats': selectedSeats,
-          'seatDocIds': seatDocIds, 
+          'seatDocIds': seatDocIds,
           'totalPrice': totalPrice,
           'posterPath': posterPath,
           'timestamp': Timestamp.now(),
@@ -130,7 +146,7 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Tiket berhasil dikonfirmasi!')),
       );
-      
+
       await _paymentApiService.launchMidtransPayment();
 
       Navigator.popUntil(context, ModalRoute.withName('home'));
@@ -142,31 +158,29 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    if (movieId.isEmpty && selectedSeats.isEmpty && totalPrice == 0.0 && ModalRoute.of(context)?.settings.arguments != null) {
+    if (movieId.isEmpty &&
+        selectedSeats.isEmpty &&
+        totalPrice == 0.0 &&
+        ModalRoute.of(context)?.settings.arguments != null) {
       return Scaffold(
         appBar: AppBar(title: const Text("Konfirmasi Tiket")),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     if (movieId.isEmpty && selectedSeats.isEmpty && totalPrice == 0.0) {
-       return Scaffold(
+      return Scaffold(
         appBar: AppBar(title: const Text("Konfirmasi Tiket")),
         body: const Center(child: Text("Tidak ada data tiket.")),
       );
     }
 
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           "Konfirmasi Tiket",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -185,26 +199,30 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
                       width: 80,
                       height: 120,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        width: 80,
-                        height: 120,
-                        color: Colors.grey.shade300,
-                        child: const Icon(Icons.broken_image, size: 40),
-                      ),
+                      errorBuilder:
+                          (context, error, stackTrace) => Container(
+                            width: 80,
+                            height: 120,
+                            color: Colors.grey.shade300,
+                            child: const Icon(Icons.broken_image, size: 40),
+                          ),
                     ),
                   ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     "Movie: ${movieName.isNotEmpty ? movieName : 'Unknown Movie'}",
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-      
+
             const SizedBox(height: 24),
             const Divider(height: 1, color: Color(0xFFEEEEEE)),
             const SizedBox(height: 24),
@@ -217,7 +235,7 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
                 color: Colors.black,
               ),
             ),
-            
+
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,8 +245,13 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
                   style: TextStyle(fontSize: 15, color: Colors.grey[800]),
                 ),
                 Text(
-                  selectedSeats.isNotEmpty ? selectedSeats.join(', ').toUpperCase() : 'N/A',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  selectedSeats.isNotEmpty
+                      ? selectedSeats.join(', ').toUpperCase()
+                      : 'N/A',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -243,7 +266,10 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
                 ),
                 Text(
                   'Rp ${totalPrice.toStringAsFixed(0)}',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -251,24 +277,27 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
             const SizedBox(height: 24),
             const Divider(height: 1, color: Color(0xFFEEEEEE)),
             const SizedBox(height: 24),
-            
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _handleConfirmation,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, 
+                  backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 child: const Text("Bayar"),
               ),
             ),
-            const Spacer(), 
+            const Spacer(),
           ],
         ),
       ),

@@ -101,6 +101,12 @@ class _MoviePageState extends State<MoviePage>
                         padding: const EdgeInsets.all(16.0),
                         child: Text(args['overview'] ?? 'Tidak ada sinopsis.'),
                       ),
+                      ElevatedButton(
+                        onPressed: () {
+                          throw Exception('Test Crash for Crashlytics');
+                        },
+                        child: const Text('Test Crash'),
+                      ),
                     ],
                   ),
                 ),
