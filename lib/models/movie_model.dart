@@ -8,7 +8,7 @@ class Movie {
     required this.id,
     required this.title,
     required this.overview,
-    required this.posterPath
+    required this.posterPath,
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) {

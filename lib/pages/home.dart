@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:finalpbb/pages/movies.dart';
 import 'package:finalpbb/pages/profile.dart';
-import 'package:finalpbb/pages/orders_detail.dart'; 
+import 'package:finalpbb/pages/orders_detail.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchMovies();
   }
 
-  final PageController _carouselController = PageController(viewportFraction: 0.8);
+  final PageController _carouselController = PageController(
+    viewportFraction: 0.8,
+  );
   @override
   void dispose() {
     _carouselController.dispose();
@@ -60,7 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _bottomNavBar() {
     switch (status) {
       case 0:
-        return buildMoviesHome(isLoading: _isLoading, movies: _movies, context: context);
+        return buildMoviesHome(
+          isLoading: _isLoading,
+          movies: _movies,
+          context: context,
+        );
 
       case 1:
         return StreamBuilder<User?>(
@@ -80,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       .orderBy('timestamp', descending: true)
                       .snapshots(),
               builder: (context, snapshot) {
-
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -88,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (docs.isEmpty) {
                   return const Center(child: Text('Belum ada pesanan.'));
                 }
-                
+
                 return ListView.builder(
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
@@ -106,15 +111,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Kursi: ${(data['selectedSeats'] as List).join(', ')}\nTotal: Rp${data['totalPrice']}',
                       ),
                       isThreeLine: true,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailScreen(
-                            orderData: data,
-                            orderId: docs[index].id, 
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => OrderDetailScreen(
+                                    orderData: data,
+                                    orderId: docs[index].id,
+                                  ),
+                            ),
                           ),
-                        ),
-                      ),
                     );
                   },
                 );
@@ -175,7 +182,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.transparent, // transparan, biar BoxDecoration di atas keliatan
+          backgroundColor:
+              Colors
+                  .transparent, // transparan, biar BoxDecoration di atas keliatan
           elevation: 0, // hapus shadow bawaan
           selectedItemColor: Colors.purple, // warna icon saat aktif
           unselectedItemColor: Colors.black, // warna icon saat nonaktif
@@ -183,8 +192,14 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: _tempStatus,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Movies'),
-            BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Orders'),
-            BottomNavigationBarItem(icon: Icon(Icons.local_offer), label: 'Promos'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_bag),
+              label: 'Orders',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.local_offer),
+              label: 'Promos',
+            ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),

@@ -13,10 +13,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profile"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Profile"), centerTitle: true),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -33,10 +30,14 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.person_off, size: 80, color: Colors.grey),
                   const SizedBox(height: 16),
-                  const Text("You're not logged in", style: TextStyle(fontSize: 18)),
+                  const Text(
+                    "You're not logged in",
+                    style: TextStyle(fontSize: 18),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => Navigator.pushReplacementNamed(context, 'login'),
+                    onPressed:
+                        () => Navigator.pushReplacementNamed(context, 'login'),
                     child: const Text('Login'),
                   ),
                 ],
@@ -49,17 +50,23 @@ class ProfileScreen extends StatelessWidget {
             child: Align(
               alignment: Alignment.topCenter,
               child: Column(
-                mainAxisSize: MainAxisSize.min, // Biar column nggak memenuhi tinggi
+                mainAxisSize:
+                    MainAxisSize.min, // Biar column nggak memenuhi tinggi
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage("https://randomuser.me/api/portraits/men/12.jpg"),
+                    backgroundImage: NetworkImage(
+                      "https://randomuser.me/api/portraits/men/12.jpg",
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     user.displayName ?? 'No Name',
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
@@ -73,13 +80,14 @@ class ProfileScreen extends StatelessWidget {
                     onPressed: () => _logout(context),
                     icon: const Icon(Icons.logout),
                     label: const Text("Logout"),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
                   ),
                 ],
               ),
             ),
           );
-
         },
       ),
     );

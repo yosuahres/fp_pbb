@@ -19,10 +19,7 @@ class PopularMoviesPage extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 12),
               child: Text(
                 "Popular Movies",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
             GridView.builder(
@@ -56,23 +53,30 @@ class PopularMoviesPage extends StatelessWidget {
                       children: [
                         movie.posterPath.isNotEmpty
                             ? Image.network(
-                                movie.posterUrl,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              )
+                              movie.posterUrl,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            )
                             : Container(
-                                color: Colors.grey.shade800,
-                                child: const Center(
-                                  child: Icon(Icons.movie, size: 40, color: Colors.white),
+                              color: Colors.grey.shade800,
+                              child: const Center(
+                                child: Icon(
+                                  Icons.movie,
+                                  size: 40,
+                                  color: Colors.white,
                                 ),
                               ),
+                            ),
                         Positioned(
                           bottom: 0,
                           left: 0,
                           right: 0,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 4,
+                            ),
                             color: Colors.black.withOpacity(0.6),
                             child: Text(
                               movie.title,

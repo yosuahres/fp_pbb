@@ -60,24 +60,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       // appBar: AppBar(
       //   title: const Text('Create Account'),
       //   // centerTitle: true,
       // ),
-
-
-      body: 
-      SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Stack(
           children: [
             Container(
               height: 400,
-              decoration: const BoxDecoration(
-                color: Color(0xFF212121),
-              ),
+              decoration: const BoxDecoration(color: Color(0xFF212121)),
               child: Stack(
                 children: [
-                //logo app ntar
+                  //logo app ntar
                   Positioned(
                     top: 150,
                     left: 150,
@@ -117,7 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
-                    )
+                    ),
                   ),
                 ],
               ),
@@ -125,7 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             ///area signup
             Padding(
-              padding: EdgeInsets.only(top:300),
+              padding: EdgeInsets.only(top: 300),
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -157,14 +153,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           hintText: 'Email',
                           hintStyle: TextStyle(color: Colors.grey.shade500),
-                          prefixIcon: Icon(Icons.email_outlined, color: Colors.grey.shade500),
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: Colors.grey.shade500,
+                          ),
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 20.0),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 18.0,
+                            horizontal: 20.0,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -176,14 +178,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           hintText: 'Enter your password',
                           hintStyle: TextStyle(color: Colors.grey.shade500),
-                          prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade500),
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey.shade500,
+                          ),
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 20.0),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 18.0,
+                            horizontal: 20.0,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -195,83 +203,102 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: InputDecoration(
                           hintText: 'Confirm your password',
                           hintStyle: TextStyle(color: Colors.grey.shade500),
-                          prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade500),
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey.shade500,
+                          ),
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 20.0),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 18.0,
+                            horizontal: 20.0,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
 
-                                    _errorCode != ""
-                  ? Column(
-                      children: [Text(_errorCode), const SizedBox(height: 24)],
-                    )
-                  : const SizedBox(height: 0),
-              // OutlinedButton(
-              //   onPressed: register,
-              //   child: _isLoading
-              //       ? const CircularProgressIndicator()
-              //       : const Text('Register'),
-              // ),
+                      _errorCode != ""
+                          ? Column(
+                            children: [
+                              Text(_errorCode),
+                              const SizedBox(height: 24),
+                            ],
+                          )
+                          : const SizedBox(height: 0),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF424242),
-                    padding: const EdgeInsets.symmetric(vertical: 18.0), 
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    elevation: 3
-                  ),
-                  child: _isLoading
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            strokeWidth: 2.5,
+                      // OutlinedButton(
+                      //   onPressed: register,
+                      //   child: _isLoading
+                      //       ? const CircularProgressIndicator()
+                      //       : const Text('Register'),
+                      // ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : register,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF424242),
+                            padding: const EdgeInsets.symmetric(vertical: 18.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            elevation: 3,
                           ),
-                        )
-                      : const Text(
-                          'Sign Up',
-                          style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w600, color: Colors.white),
-                        ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Already have an account? ',
-                        style: TextStyle(color: Colors.grey.shade700  , fontSize: 14),
-                      ),
-                      GestureDetector(
-                        onTap: navigateLogin,
-                        child: Text(
-                          'Sign In',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            // decoration: TextDecoration.underline,
-                            // decorationColor: Colors.black,
-                            // decorationThickness: 1.5,
-                          ),
+                          child:
+                              _isLoading
+                                  ? SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                  : const Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      fontSize: 16.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                         ),
                       ),
-                    ],
-                  )
+
+                      const SizedBox(height: 16),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Already have an account? ',
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontSize: 14,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: navigateLogin,
+                            child: Text(
+                              'Sign In',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                // decoration: TextDecoration.underline,
+                                // decorationColor: Colors.black,
+                                // decorationThickness: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -310,16 +337,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
       //         ),
 
       //         const SizedBox(height: 16),
-              
+
       //         TextField(
       //           //password
       //           controller: _passwordController,
-      //           obscureText: true, 
+      //           obscureText: true,
       //           style: TextStyle(color: Colors.black87),
       //           decoration: InputDecoration(
       //             hintText: 'Enter your password',
       //             hintStyle: TextStyle(color: Colors.grey.shade500),
-      //             prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade500), 
+      //             prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade500),
       //             filled: true,
       //             fillColor: Colors.white,
       //             border: OutlineInputBorder(
@@ -374,7 +401,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       //               shape: RoundedRectangleBorder(
       //                 borderRadius: BorderRadius.circular(50),
       //               ),
-      //               padding: const EdgeInsets.symmetric(vertical: 16.0), 
+      //               padding: const EdgeInsets.symmetric(vertical: 16.0),
       //             ),
       //             child: _isLoading
       //                 ? SizedBox(
@@ -423,9 +450,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       //     ),
       //   ),
       // ),
-    
-    
-    
     );
   }
 }
