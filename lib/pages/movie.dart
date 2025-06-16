@@ -56,6 +56,7 @@ class _MoviePageState extends State<MoviePage>
       title: args['movieName'] ?? '',
       posterPath: args['posterPath'] ?? '',
       overview: args['overview'] ?? '',
+      voteAverage: args['voteAverage'] ?? 0.0,
     );
     return Scaffold(
       appBar: AppBar(

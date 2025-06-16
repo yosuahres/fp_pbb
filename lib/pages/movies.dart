@@ -91,6 +91,7 @@ Widget buildMoviesHome({
                                 'movieName': movie.title,
                                 'posterPath': movie.posterPath,
                                 'overview': movie.overview,
+                                'voteAverage': movie.voteAverage,
                               },
                             );
                           },
@@ -119,7 +120,7 @@ Widget buildMoviesHome({
                                   ),
                                 ),
                                 Row(
-                                  children: const [
+                                  children: [
                                     Icon(
                                       Icons.star,
                                       color: Colors.amber,
@@ -127,7 +128,8 @@ Widget buildMoviesHome({
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      "9/10 IMDb",
+                                      // Assuming vote_average is a double
+                                      "${movie.voteAverage}/10 IMDb",
                                       style: TextStyle(fontSize: 12),
                                     ),
                                   ],
@@ -180,6 +182,7 @@ Widget buildMoviesHome({
                                   'movieName': movie.title,
                                   'posterPath': movie.posterPath,
                                   'overview': movie.overview,
+                                  'voteAverage': movie.voteAverage,
                                 },
                               );
                             },
@@ -212,16 +215,16 @@ Widget buildMoviesHome({
                                           ),
                                           const SizedBox(height: 4),
                                           Row(
-                                            children: const [
-                                              Icon(
+                                            children: [
+                                              const Icon(
                                                 Icons.star,
                                                 color: Colors.amber,
                                                 size: 16,
                                               ),
-                                              SizedBox(width: 4),
+                                              const SizedBox(width: 4),
                                               Text(
-                                                "8/10 IMDb",
-                                                style: TextStyle(fontSize: 12),
+                                                "${movie.voteAverage}/10 IMDb",
+                                                style: const TextStyle(fontSize: 12),
                                               ),
                                             ],
                                           ),
