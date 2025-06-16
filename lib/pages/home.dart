@@ -198,8 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Orders',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer),
-              label: 'Promos',
+              icon: Icon(Icons.reviews),
+              label: 'Reviews',
             ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
