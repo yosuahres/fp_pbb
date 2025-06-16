@@ -14,6 +14,7 @@ import 'package:finalpbb/pages/register.dart';
 import 'package:finalpbb/pages/watchlist.dart';
 import 'package:finalpbb/pages/fitur_tiket/ticketseat.dart';
 import 'package:finalpbb/pages/fitur_tiket/ticketsummary.dart';
+import 'package:finalpbb/pages/review.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -68,6 +69,7 @@ class _MyAppState extends State<MyApp> {
         'watchlist': (context) => watchlistScreen(),
         'ticketseat': (context) => const TicketSeatScreen(),
         'ticketsummary': (context) => const TicketSummaryScreen(),
+        'review': (context) => const ReviewPage(),
       },
     );
   }

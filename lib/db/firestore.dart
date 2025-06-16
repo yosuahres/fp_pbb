@@ -150,4 +150,38 @@ class FirestoreService {
             .get();
     return snapshot.docs.isNotEmpty;
   }
+  
+  Future<void> addReview(Map<String, dynamic> reviewData) async {
+    final doc = FirebaseFirestore.instance.collection('reviews').doc(reviewData['id']);
+    await doc.set({
+      'id': reviewData['id'],
+      'movieId': reviewData['movieId'],
+      'userId': reviewData['userId'],
+      'content': reviewData['content'],
+      'rating': reviewData['rating'],
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> updateReview(Map<String, dynamic> reviewData) async {
+    final doc = FirebaseFirestore.instance.collection('reviews').doc(reviewData['id']);
+    await doc.update({
+      'content': reviewData['content'],
+      'rating': reviewData['rating'],
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteReview(String id) async {
+    await FirebaseFirestore.instance.collection('reviews').doc(id).delete();
+  }
+
+  Stream<List<Map<String, dynamic>>> getReviewsForMovie(String movieId) {
+    return FirebaseFirestore.instance
+        .collection('reviews')
+        .where('movieId', isEqualTo: movieId)
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+  }
 }

@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalpbb/pages/movies.dart';
 import 'package:finalpbb/pages/profile.dart';
 import 'package:finalpbb/pages/orders_detail.dart';
+import 'package:finalpbb/pages/review.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -131,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
 
       case 2:
-        return const Center(child: Text('Promos'));
+        return const ReviewPage();
       case 3:
         return const ProfileScreen();
       default:
