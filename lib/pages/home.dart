@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // if (snapshot.hasData) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Popular Movies'),
+        title: const Text('MoTix'),
         centerTitle: true,
         actions: [
           IconButton(
