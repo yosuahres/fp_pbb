@@ -55,6 +55,7 @@ Fitur movie details menampilkan informasi lengkap tentang film, termasuk sinopsi
 Fitur beli tiket memungkinkan pengguna untuk memilih film, jadwal, dan kursi. Setelah memilih, pengguna dapat melakukan pembayaran dan mendapatkan tiket digital.
 ![Buy Ticket Page 1](images/buy_ticket_page_1.png)
 ![Buy Ticket Page 2](images/buy_ticket_page_2.png)
+![Buy Ticket Page 2](images/buy_ticket_page_3.png)
 
 # CRUD Review Movie (Fadhil)
 Fitur review movie memungkinkan pengguna untuk menulis, mengedit, dan menghapus review tentang film yang telah ditonton. Review dapat membantu pengguna lain dalam memilih film.
