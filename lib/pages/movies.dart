@@ -224,7 +224,9 @@ Widget buildMoviesHome({
                                               const SizedBox(width: 4),
                                               Text(
                                                 "${movie.voteAverage}/10 IMDb",
-                                                style: const TextStyle(fontSize: 12),
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ],
                                           ),
